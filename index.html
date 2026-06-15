@@ -235,10 +235,14 @@ td{padding:13px 18px;vertical-align:middle}
     </div>
     <div class="content">
 
-      <!-- período filter (shared, shown on data views) -->
+      <!-- período filter (intervalo de datas do orçamento, shared, shown on data views) -->
       <div class="controls" id="periodBar" style="margin-bottom:22px">
         <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Período:</div>
-        <select id="fPeriodo"><option value="">Todos os períodos</option></select>
+        <label for="fDataIni" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">De</label>
+        <input type="date" id="fDataIni" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff">
+        <label for="fDataFim" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Até</label>
+        <input type="date" id="fDataFim" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff">
+        <button id="btnLimparData" class="btn btn-ghost" style="font-size:13px;padding:8px 14px">Limpar datas</button>
       </div>
 
       <section class="view active" id="view-overview">
@@ -401,8 +405,19 @@ function norm(s){ if(!s) return ""; return s.toString().trim().toLowerCase().nor
 function titlecase(s){ if(!s) return ""; var low=['de','da','do','das','dos','e']; return s.toString().trim().split(/\s+/).map(function(w){var l=w.toLowerCase(); return low.indexOf(l)>=0?l:(l.charAt(0).toUpperCase()+l.slice(1));}).join(' '); }
 
 /* período atualmente filtrado */
-var periodoFiltro = "";
-function dadosFiltrados(){ return periodoFiltro ? DADOS.filter(function(r){return r.periodo===periodoFiltro;}) : DADOS; }
+var dataIniFiltro = "";
+var dataFimFiltro = "";
+function dadosFiltrados(){
+  if(!dataIniFiltro && !dataFimFiltro) return DADOS;
+  return DADOS.filter(function(r){
+    // Dados antigos importados antes deste ajuste não têm data_orcamento.
+    // Quando há filtro de data ativo, ficam de fora (não há data pra comparar).
+    if(!r.data_orcamento) return false;
+    if(dataIniFiltro && r.data_orcamento < dataIniFiltro) return false;
+    if(dataFimFiltro && r.data_orcamento > dataFimFiltro) return false;
+    return true;
+  });
+}
 
 /* ============ NAV ============ */
 document.getElementById('today').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -556,20 +571,25 @@ function renderPending(){
   document.getElementById('pendingBody').innerHTML=pb;
 }
 
-/* ============ FILTROS GERAIS (período, selects) ============ */
+/* ============ FILTROS GERAIS (intervalo de datas, selects) ============ */
 function rebuildFilters(){
-  var colabs=[]; var dents=[]; var periodos=[];
+  var colabs=[]; var dents=[];
   DADOS.forEach(function(r){
     if(r.colaboradora&&colabs.indexOf(r.colaboradora)<0)colabs.push(r.colaboradora);
     (r.dentistas||[]).forEach(function(d){if(dents.indexOf(d)<0)dents.push(d);});
-    if(r.periodo&&periodos.indexOf(r.periodo)<0)periodos.push(r.periodo);
   });
   colabs.sort(); dents.sort();
   var fc=document.getElementById('fColab'); fc.innerHTML='<option value="">Todas as colaboradoras</option>'+colabs.map(function(c){return '<option>'+c+'</option>';}).join('');
   var fd=document.getElementById('fDent'); fd.innerHTML='<option value="">Todos os dentistas</option>'+dents.map(function(d){return '<option>'+d+'</option>';}).join('');
-  var fp=document.getElementById('fPeriodo'); fp.innerHTML='<option value="">Todos os períodos</option>'+periodos.map(function(p){return '<option'+(p===periodoFiltro?' selected':'')+'>'+p+'</option>';}).join('');
 }
-document.getElementById('fPeriodo').onchange=function(e){periodoFiltro=e.target.value; ps_.colab='';ps_.dent='';ps_.q=''; document.getElementById('q').value=''; document.getElementById('fColab').value='';document.getElementById('fDent').value=''; renderAll();};
+document.getElementById('fDataIni').onchange=function(e){ dataIniFiltro=e.target.value; renderAll(); };
+document.getElementById('fDataFim').onchange=function(e){ dataFimFiltro=e.target.value; renderAll(); };
+document.getElementById('btnLimparData').onclick=function(){
+  dataIniFiltro=""; dataFimFiltro="";
+  document.getElementById('fDataIni').value="";
+  document.getElementById('fDataFim').value="";
+  renderAll();
+};
 
 /* ============ HISTÓRICO DE IMPORTAÇÕES ============ */
 function renderHist(){
@@ -588,7 +608,6 @@ async function removeImport(id){
   if(!confirm('Remover a importação "'+im.nome+'"? Os '+im.n+' registros dela sairão do painel.'))return;
   DADOS=DADOS.filter(function(r){return r._imp!==id;});
   IMPORTS=IMPORTS.filter(function(x){return x.id!==id;});
-  if(periodoFiltro && !DADOS.some(function(r){return r.periodo===periodoFiltro;})) periodoFiltro="";
   saveStore(); rebuildFilters(); renderHist(); renderAll();
   try {
     await db.collection('painel_coordenacao').doc(id).delete();
@@ -600,7 +619,7 @@ async function removeImport(id){
 document.getElementById('btnLimparTudo').onclick=async function(){
   if(!ehAdmin) return;
   if(!confirm('Isso vai apagar TODOS os dados importados deste navegador E da nuvem. Tem certeza?'))return;
-  DADOS=[]; IMPORTS=[]; periodoFiltro=""; saveStore(); rebuildFilters(); renderHist(); renderAll();
+  DADOS=[]; IMPORTS=[]; saveStore(); rebuildFilters(); renderHist(); renderAll();
   try {
     var snap = await db.collection('painel_coordenacao').get();
     var batch = db.batch();
@@ -712,6 +731,30 @@ function hasDate(v){
   var s=(''+v).trim();
   return s.length>0 && s.toLowerCase()!=='nan';
 }
+function parseDataBR(v){
+  if(v===null||v===undefined||v==='') return null;
+  if(v instanceof Date && !isNaN(v.getTime())){
+    var yy=v.getFullYear(), mm=String(v.getMonth()+1).padStart(2,'0'), dd=String(v.getDate()).padStart(2,'0');
+    return yy+'-'+mm+'-'+dd;
+  }
+  var s=(''+v).trim();
+  if(!s || s.toLowerCase()==='nan') return null;
+  var iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(iso){
+    var y=+iso[1], m=+iso[2], d=+iso[3];
+    if(y>=1900 && y<=2100 && m>=1 && m<=12 && d>=1 && d<=31)
+      return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    return null;
+  }
+  var br=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if(br){
+    var dB=+br[1], mB=+br[2], yB=+br[3];
+    if(yB<100) yB += yB<50 ? 2000 : 1900;
+    if(yB>=1900 && yB<=2100 && mB>=1 && mB<=12 && dB>=1 && dB<=31)
+      return yB+'-'+String(mB).padStart(2,'0')+'-'+String(dB).padStart(2,'0');
+  }
+  return null;
+}
 
 async function cruzar(){
   var map=getMapping();
@@ -767,15 +810,17 @@ async function cruzar(){
       var ciPe=colIndex(sEf, pacSelEf.value);
       var ciVal = map.valor?colIndex(sEf, map.valor.header):-1;
       var ciApr = map.dt_aprov?colIndex(sEf, map.dt_aprov.header):-1;
+      var ciOrc = map.dt_orc?colIndex(sEf, map.dt_orc.header):-1;
       var ciTra = map.tratamento?colIndex(sEf, map.tratamento.header):-1;
       var ciDen = map.dentista?colIndex(sEf, map.dentista.header):-1;
       sEf.rows.forEach(function(row){
         var reg=getReg(row[ciPe]); if(!reg)return;
         var pv = ciVal>=0?parseValor(row[ciVal]):{val:0,erro:false};
         var aprovado = ciApr>=0?hasDate(row[ciApr]):false;
+        var dataOrc = ciOrc>=0?parseDataBR(row[ciOrc]):null;
         var trat = ciTra>=0?(''+row[ciTra]).trim():'Orçamento';
         var dent = ciDen>=0?titlecase(row[ciDen]):'';
-        reg.itens.push({tratamento:trat||'Orçamento', valor:pv.val, aprovado:aprovado, erro:pv.erro, dentista:dent});
+        reg.itens.push({tratamento:trat||'Orçamento', valor:pv.val, aprovado:aprovado, erro:pv.erro, dentista:dent, dt_orc:dataOrc});
         if(dent && reg.dentistas.indexOf(dent)<0) reg.dentistas.push(dent);
       });
     }
@@ -788,11 +833,14 @@ async function cruzar(){
     var aprov=0, aberto=0, erroFlag=false;
     r.itens.forEach(function(it){ if(it.erro){erroFlag=true;return;} if(it.aprovado)aprov+=it.valor; else aberto+=it.valor; });
     var status = r.itens.length===0?'sem_orcamento':(aprov>0?'fechou':'em_aberto');
+    var datasOrc = r.itens.map(function(it){return it.dt_orc;}).filter(function(d){return d;});
+    var dataOrcMin = datasOrc.length ? datasOrc.sort()[0] : null;
     return {
       paciente:r.paciente, colaboradora:r.colaboradora, dentistas:r.dentistas,
       n_orcamentos:r.itens.length, val_aprovado:Math.round(aprov*100)/100, val_aberto:Math.round(aberto*100)/100,
       val_total:Math.round((aprov+aberto)*100)/100, status:status, no_cadastro:false,
-      tem_valor_erro:erroFlag, itens:r.itens, periodo:nome, _imp:impId
+      tem_valor_erro:erroFlag, itens:r.itens, periodo:nome, _imp:impId,
+      data_orcamento:dataOrcMin
     };
   });
 

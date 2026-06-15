@@ -789,14 +789,17 @@ document.getElementById('btnCancelar').onclick=function(){
 /* ============ LOGIN ============ */
 (function(){
   var HASH="70f98d48e317d550803e1e8e1aad1bb3cc902b4d0905abf3d49f9dd51d00eff4";
+  var SESSION_KEY="amorsaude_sessao_ok";
   function sha256(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");});}
+  function unlock(){ document.getElementById("lockScreen").classList.add("hidden"); boot(); }
   function tryUnlock(){
     var v=document.getElementById("lockInput").value; if(!v)return;
     sha256(v).then(function(h){
-      if(h===HASH){ document.getElementById("lockScreen").classList.add("hidden"); boot(); }
+      if(h===HASH){ sessionStorage.setItem(SESSION_KEY,"1"); unlock(); }
       else{ document.getElementById("lockErr").textContent="Senha incorreta. Tente novamente."; document.getElementById("lockInput").value=""; document.getElementById("lockInput").focus(); }
     });
   }
+  if(sessionStorage.getItem(SESSION_KEY)==="1"){ unlock(); return; }
   document.getElementById("lockBtn").addEventListener("click",tryUnlock);
   document.getElementById("lockInput").addEventListener("keydown",function(e){if(e.key==="Enter")tryUnlock();});
 })();

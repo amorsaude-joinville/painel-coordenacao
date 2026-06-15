@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmorSaúde Joinville · Painel do Coordenador</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 
@@ -292,6 +294,17 @@ td{padding:13px 18px;vertical-align:middle}
 
       <!-- IMPORT VIEW -->
       <section class="view" id="view-import">
+        <div id="adminLock" class="imp-step">
+          <h2><span class="step-n" style="background:var(--coral)">!</span> Área restrita</h2>
+          <div class="desc">Esta área é restrita. Digite a senha de administrador para importar ou remover dados.</div>
+          <div style="margin-left:36px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <input type="password" id="adminInput" placeholder="Senha de administrador" style="padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;width:280px">
+            <button class="btn" id="adminBtn">Liberar</button>
+          </div>
+          <div id="adminErr" style="margin-left:36px;margin-top:10px;color:var(--coral);font-size:13px"></div>
+        </div>
+
+        <div id="adminContent" style="display:none">
         <div class="warn-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <div>Os dados importados ficam salvos <b>apenas neste navegador, neste computador</b>. Em outro dispositivo será preciso importar de novo. Por conter dados de pacientes, use o botão <b>Limpar tudo</b> ao terminar em computadores compartilhados.</div></div>
 
@@ -330,6 +343,7 @@ td{padding:13px 18px;vertical-align:middle}
           <div style="margin-left:36px" id="histList"></div>
           <div class="imp-actions"><button class="btn btn-ghost" id="btnLimparTudo" style="color:var(--coral);border-color:var(--coral-soft)">Limpar tudo</button></div>
         </div>
+        </div>
       </section>
 
       <section class="view" id="view-pending"><div id="pendingBody"></div></section>
@@ -338,6 +352,18 @@ td{padding:13px 18px;vertical-align:middle}
 </div>
 
 <script>
+
+/* ============ FIREBASE ============ */
+var firebaseConfig = {
+  apiKey: "AIzaSyBcw3uGKeDJdP-qSngU7rsvfUxY4QYEqvQ",
+  authDomain: "painel-coordenacao.firebaseapp.com",
+  projectId: "painel-coordenacao",
+  storageBucket: "painel-coordenacao.firebasestorage.app",
+  messagingSenderId: "718169610760",
+  appId: "1:718169610760:web:8e64d0a3e2456b3e98cfbd"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
 
 /* ============ ESTADO GLOBAL ============ */
 var STORE_KEY = "amorsaude_painel_dados_v1";
@@ -555,7 +581,8 @@ function renderHist(){
   }).join('');
   el.querySelectorAll('.hdel').forEach(function(btn){btn.onclick=function(){removeImport(btn.dataset.id);};});
 }
-function removeImport(id){
+async function removeImport(id){
+  if(!ehAdmin) return;
   var im=IMPORTS.find(function(x){return x.id===id;});
   if(!im)return;
   if(!confirm('Remover a importação "'+im.nome+'"? Os '+im.n+' registros dela sairão do painel.'))return;
@@ -563,10 +590,26 @@ function removeImport(id){
   IMPORTS=IMPORTS.filter(function(x){return x.id!==id;});
   if(periodoFiltro && !DADOS.some(function(r){return r.periodo===periodoFiltro;})) periodoFiltro="";
   saveStore(); rebuildFilters(); renderHist(); renderAll();
+  try {
+    await db.collection('painel_coordenacao').doc(id).delete();
+  } catch(e) {
+    console.warn('Firebase delete falhou:', e);
+    alert('Importação removida deste navegador, mas falhou ao remover da nuvem ('+(e.message||e)+').');
+  }
 }
-document.getElementById('btnLimparTudo').onclick=function(){
-  if(!confirm('Isso vai apagar TODOS os dados importados deste navegador. Tem certeza?'))return;
+document.getElementById('btnLimparTudo').onclick=async function(){
+  if(!ehAdmin) return;
+  if(!confirm('Isso vai apagar TODOS os dados importados deste navegador E da nuvem. Tem certeza?'))return;
   DADOS=[]; IMPORTS=[]; periodoFiltro=""; saveStore(); rebuildFilters(); renderHist(); renderAll();
+  try {
+    var snap = await db.collection('painel_coordenacao').get();
+    var batch = db.batch();
+    snap.forEach(function(doc){ batch.delete(doc.ref); });
+    await batch.commit();
+  } catch(e) {
+    console.warn('Firebase clear falhou:', e);
+    alert('Limpo deste navegador, mas falhou ao limpar a nuvem ('+(e.message||e)+').');
+  }
 };
 
 /* ============ IMPORTAÇÃO (SheetJS) ============ */
@@ -670,7 +713,7 @@ function hasDate(v){
   return s.length>0 && s.toLowerCase()!=='nan';
 }
 
-function cruzar(){
+async function cruzar(){
   var map=getMapping();
   var msg=document.getElementById('impMsg');
   function showMsg(t,cls){msg.className='imp-msg show '+cls; msg.textContent=t;}
@@ -757,9 +800,17 @@ function cruzar(){
 
   // adicionar (acumular)
   novos.forEach(function(n){ DADOS.push(n); });
-  IMPORTS.push({id:impId, nome:nome, n:novos.length, data:new Date().toISOString()});
+  var metaImp={id:impId, nome:nome, n:novos.length, data:new Date().toISOString()};
+  IMPORTS.push(metaImp);
   saveStore();
-  showMsg('Pronto! '+novos.length+' pacientes adicionados ao período "'+nome+'". Veja no painel.','ok');
+
+  try {
+    await db.collection('painel_coordenacao').doc(impId).set({dados: novos, meta: metaImp});
+    showMsg('Pronto! '+novos.length+' pacientes adicionados ao período "'+nome+'". Veja no painel.','ok');
+  } catch(e) {
+    console.warn('Firebase write falhou:', e);
+    showMsg('Importação salva neste navegador, mas falhou ao gravar na nuvem ('+(e.message||e)+'). Outros usuários só verão estes dados quando a gravação for restabelecida.','err');
+  }
 
   // reset UI
   parsedSheets=[];
@@ -777,7 +828,7 @@ fileInput.onchange=function(e){ if(e.target.files.length) handleFiles(e.target.f
 ['dragenter','dragover'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('drag');});});
 ['dragleave','drop'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('drag');});});
 drop.addEventListener('drop',function(e){ if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
-document.getElementById('btnCruzar').onclick=cruzar;
+document.getElementById('btnCruzar').onclick=function(){ if(!ehAdmin) return; cruzar(); };
 document.getElementById('btnCancelar').onclick=function(){
   parsedSheets=[]; document.getElementById('fileTags').innerHTML='';
   document.getElementById('mapStep').style.display='none';
@@ -786,11 +837,13 @@ document.getElementById('btnCancelar').onclick=function(){
   document.getElementById('impMsg').className='imp-msg';
 };
 
+/* ============ SHA256 ============ */
+function sha256(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");});}
+
 /* ============ LOGIN ============ */
 (function(){
   var HASH="70f98d48e317d550803e1e8e1aad1bb3cc902b4d0905abf3d49f9dd51d00eff4";
   var SESSION_KEY="amorsaude_sessao_ok";
-  function sha256(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");});}
   function unlock(){ document.getElementById("lockScreen").classList.add("hidden"); boot(); }
   function tryUnlock(){
     var v=document.getElementById("lockInput").value; if(!v)return;
@@ -804,11 +857,68 @@ document.getElementById('btnCancelar').onclick=function(){
   document.getElementById("lockInput").addEventListener("keydown",function(e){if(e.key==="Enter")tryUnlock();});
 })();
 
+/* ============ ADMIN GATE ============ */
+var ehAdmin = false;
+var ADMIN_HASH = "950091c73109e6981b8e8242aa2e2eb74532957638839ce586e2c01dc1d47769";
+var ADMIN_SESSION_KEY = "amorsaude_admin_ok";
+function updateAdminUI(){
+  var lock = document.getElementById('adminLock');
+  var content = document.getElementById('adminContent');
+  if(!lock || !content) return;
+  if(ehAdmin){ lock.style.display='none'; content.style.display=''; }
+  else { lock.style.display=''; content.style.display='none'; }
+}
+function tryAdminUnlock(){
+  var inp = document.getElementById('adminInput');
+  var v = inp.value;
+  if(!v) return;
+  sha256(v).then(function(h){
+    if(h === ADMIN_HASH){
+      ehAdmin = true;
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+      document.getElementById('adminErr').textContent = "";
+      inp.value = "";
+      updateAdminUI();
+    } else {
+      document.getElementById('adminErr').textContent = "Senha incorreta. Tente novamente.";
+      inp.value = "";
+      inp.focus();
+    }
+  });
+}
+if(sessionStorage.getItem(ADMIN_SESSION_KEY) === "1") ehAdmin = true;
+document.getElementById('adminBtn').addEventListener('click', tryAdminUnlock);
+document.getElementById('adminInput').addEventListener('keydown', function(e){ if(e.key === "Enter") tryAdminUnlock(); });
+updateAdminUI();
+
 /* ============ BOOT ============ */
+async function carregarDoFirebase(){
+  try {
+    var snap = await db.collection("painel_coordenacao").get();
+    if (snap.empty) return false;
+    var novosDados = [];
+    var novosImports = [];
+    snap.forEach(function(doc){
+      var d = doc.data();
+      if (Array.isArray(d.dados)) novosDados = novosDados.concat(d.dados);
+      if (d.meta) novosImports.push(d.meta);
+    });
+    if (novosDados.length === 0 && novosImports.length === 0) return false;
+    DADOS = novosDados;
+    IMPORTS = novosImports;
+    return true;
+  } catch (e) {
+    console.warn("Firebase load falhou, usando localStorage:", e);
+    return false;
+  }
+}
+
 var booted=false;
-function boot(){
+async function boot(){
   if(booted)return; booted=true;
-  loadStore(); rebuildFilters(); renderHist(); renderAll();
+  var ok = await carregarDoFirebase();
+  if(!ok) loadStore();
+  rebuildFilters(); renderHist(); renderAll();
 }
 
 </script>

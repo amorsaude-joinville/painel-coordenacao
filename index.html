@@ -4,65 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmorSaúde Joinville · Painel do Coordenador</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
 
-:root{
-  --sky:#62bdd4;          /* azul-celeste do logo */
-  --sky-dark:#3f9fb8;
-  --sky-deep:#2b7d94;
-  --sky-soft:#e6f4f8;
-  --coral:#d94436;        /* vermelho/coral do coração */
-  --coral-soft:#fbe4e1;
-  --ink:#1f2a2e;
-  --muted:#6e8088;
-  --line:#e3e9ec;
-  --bg:#f4f7f9;
-  --card:#ffffff;
-  --amber:#c07a1e;
-  --amber-soft:#f8eed9;
-  --green:#2f8f6b;
-  --green-soft:#e1f1ea;
-}
+:root{--sky:#62bdd4;--sky-dark:#3f9fb8;--sky-deep:#2b7d94;--sky-soft:#e6f4f8;--coral:#d94436;--coral-soft:#fbe4e1;--ink:#1f2a2e;--muted:#6e8088;--line:#e3e9ec;--bg:#f4f7f9;--card:#fff;--amber:#c07a1e;--amber-soft:#f8eed9;--green:#2f8f6b;--green-soft:#e1f1ea}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5}
-
-/* ===== Layout shell ===== */
+/* lock */
+#lockScreen{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#62bdd4 0%,#3f9fb8 60%,#2b7d94 100%);display:flex;align-items:center;justify-content:center}
+#lockScreen.hidden{display:none}
+.lock-card{background:#fff;border-radius:20px;padding:42px 38px 34px;width:min(92vw,380px);box-shadow:0 24px 60px rgba(0,0,0,.25);text-align:center}
+.lock-logo{width:64px;height:64px;border-radius:16px;background:#eaf6f9;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.lock-logo svg{width:40px;height:40px}
+.lock-card h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-bottom:5px}
+.lock-card p{font-size:13px;color:var(--muted);margin-bottom:24px}
+.lock-field{margin-bottom:14px}
+.lock-field input{width:100%;padding:13px 16px;border:1px solid #dfe6e9;border-radius:11px;font-size:15px;font-family:inherit;text-align:center}
+.lock-field input:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
+.lock-btn{width:100%;padding:13px;border:none;border-radius:11px;background:var(--coral);color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
+.lock-btn:hover{background:#c23a2d}
+.lock-err{color:var(--coral);font-size:12.5px;margin-top:13px;min-height:16px;font-weight:500}
+.lock-foot{margin-top:22px;font-size:11px;color:#9aa7ac}
+/* shell */
 .app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
-
-/* Sidebar */
-.side{background:linear-gradient(180deg,var(--sky) 0%,var(--sky-dark) 100%);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.side{background:linear-gradient(180deg,var(--sky),var(--sky-dark));color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
 .brand{padding:24px 22px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.18)}
-.logo{width:42px;height:42px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.logo{width:42px;height:42px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .logo svg{width:26px;height:26px}
 .brand .name{font-weight:700;font-size:15px;line-height:1.1}
-.brand .unit{font-size:11px;opacity:.85;letter-spacing:.02em}
-nav{padding:14px 12px;flex:1}
+.brand .unit{font-size:11px;opacity:.85}
+nav{padding:14px 12px;flex:1;overflow-y:auto}
 .nav-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;padding:10px 12px 6px}
 .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:rgba(255,255,255,.92);transition:.14s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
 .nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.9}
 .nav-item:hover{background:rgba(255,255,255,.14)}
 .nav-item.on{background:#fff;color:var(--sky-deep);font-weight:600}
-.nav-item.on svg{opacity:1}
 .nav-item .badge-n{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--coral);color:#fff;padding:1px 7px;border-radius:999px}
-.nav-item.on .badge-n{background:var(--coral)}
 .side-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.18);font-size:11px;opacity:.85}
 .side-foot .who{display:flex;align-items:center;gap:9px;margin-bottom:4px}
 .side-foot .dot{width:7px;height:7px;border-radius:50%;background:#fff}
-
-/* Main */
 .main{display:flex;flex-direction:column;min-width:0}
 .topbar{background:var(--card);border-bottom:1px solid var(--line);padding:16px 30px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
 .topbar h1{font-size:19px;font-weight:600}
 .topbar .crumb{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .topbar .date{font-size:12.5px;color:var(--muted)}
 .content{padding:28px 30px 60px;flex:1}
-
-.view{display:none}
-.view.active{display:block;animation:fade .25s ease}
+.view{display:none}.view.active{display:block;animation:fade .25s ease}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-/* ===== KPI cards ===== */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:24px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden}
 .kpi .ic{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
@@ -72,11 +61,9 @@ nav{padding:14px 12px;flex:1}
 .kpi .val small{font-size:16px;font-weight:600;color:var(--muted)}
 .kpi .sub{font-size:12px;color:var(--muted);margin-top:7px}
 .kpi.k-sky .ic{background:var(--sky-soft);color:var(--sky-deep)}
-.kpi.k-green .ic{background:var(--green-soft);color:var(--green)} .kpi.k-green .val{color:var(--green)}
+.kpi.k-green .ic{background:var(--green-soft);color:var(--green)}.kpi.k-green .val{color:var(--green)}
 .kpi.k-coral .ic{background:var(--coral-soft);color:var(--coral)}
-.kpi.k-amber .ic{background:var(--amber-soft);color:var(--amber)} .kpi.k-amber .val{color:var(--amber)}
-
-/* ===== Panels ===== */
+.kpi.k-amber .ic{background:var(--amber-soft);color:var(--amber)}.kpi.k-amber .val{color:var(--amber)}
 .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-bottom:22px}
 @media(max-width:980px){.grid2{grid-template-columns:1fr}}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -84,18 +71,12 @@ nav{padding:14px 12px;flex:1}
 .panel-h h2{font-size:15px;font-weight:600}
 .panel-h .hint{font-size:11.5px;color:var(--muted)}
 .panel-b{padding:20px 22px}
-
-/* Conversion bar */
 .convbar{height:34px;border-radius:8px;overflow:hidden;display:flex;font-size:12px;font-weight:600;color:#fff}
 .convbar .seg{display:flex;align-items:center;justify-content:center;white-space:nowrap;min-width:0}
-.convbar .s-fechou{background:var(--green)}
-.convbar .s-aberto{background:var(--amber)}
-.convbar .s-sem{background:#b9c4c9}
+.convbar .s-fechou{background:var(--green)}.convbar .s-aberto{background:var(--amber)}.convbar .s-sem{background:#b9c4c9}
 .legend{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap}
 .legend span{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
-.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
-
-/* Ranking list */
+.legend i{width:10px;height:10px;border-radius:3px}
 .rank{list-style:none}
 .rank li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
 .rank li:last-child{border:none}
@@ -104,26 +85,21 @@ nav{padding:14px 12px;flex:1}
 .rank .nm small{display:block;color:var(--muted);font-weight:400;font-size:11.5px}
 .rank .mt{text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600}
 .rank .mt small{display:block;color:var(--muted);font-size:10px;font-weight:500}
-
-/* ===== Controls ===== */
 .controls{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-bottom:18px}
 .search{flex:1;min-width:220px;position:relative}
-.search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-family:inherit;font-size:14px;color:var(--ink)}
+.search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-family:inherit;font-size:14px}
 .search input:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
 .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
-select{padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-family:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+select{padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-family:inherit;font-size:14px;cursor:pointer}
 select:focus{outline:2px solid var(--sky);outline-offset:-1px}
 .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.pill{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);transition:.14s}
+.pill{font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);transition:.14s}
 .pill:hover{border-color:var(--sky);color:var(--sky-deep)}
 .pill.on{background:var(--sky);color:#fff;border-color:var(--sky)}
 .pill .ct{opacity:.65;margin-left:5px}
-
-/* ===== Table ===== */
 .tablecard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 table{width:100%;border-collapse:collapse;font-size:14px}
-thead th{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);background:#fafcfd;cursor:pointer;user-select:none;white-space:nowrap;position:sticky;top:69px}
-thead th:hover{color:var(--ink)}
+thead th{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);background:#fafcfd;cursor:pointer;user-select:none;white-space:nowrap}
 thead th.num{text-align:right}
 tbody tr{border-bottom:1px solid var(--line);transition:background .12s}
 tbody tr.clickable{cursor:pointer}
@@ -143,7 +119,6 @@ td{padding:13px 18px;vertical-align:middle}
 .badge.fechou{background:var(--green-soft);color:var(--green)}
 .badge.em_aberto{background:var(--amber-soft);color:var(--amber)}
 .badge.sem_orcamento{background:#eef1f3;color:var(--muted)}
-
 .detail td{padding:0;background:#f8fbfc}
 .detail-inner{padding:4px 18px 16px}
 .detail-inner table{font-size:13px}
@@ -153,11 +128,8 @@ td{padding:13px 18px;vertical-align:middle}
 .dot2{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px}
 .dot2.y{background:var(--green)}.dot2.n{background:var(--amber)}
 .flag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--coral);background:var(--coral-soft);padding:2px 8px;border-radius:5px}
-
 .empty{padding:64px;text-align:center;color:var(--muted)}
 .empty .big{font-size:17px;color:var(--ink);font-weight:600;margin-bottom:6px}
-
-/* Pendências cards */
 .pend-card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:12px;padding:18px 22px;margin-bottom:16px}
 .pend-card.coral{border-left-color:var(--coral)}
 .pend-card h3{font-size:14.5px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:9px}
@@ -166,116 +138,122 @@ td{padding:13px 18px;vertical-align:middle}
 .pend-card p{font-size:13px;color:var(--muted);margin-bottom:12px}
 .pend-list{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font-size:12.5px;padding:6px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
-
 .count-foot{font-size:12.5px;color:var(--muted);margin-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-
+/* IMPORT */
+.imp-step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:20px}
+.imp-step h2{font-size:16px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:10px}
+.imp-step .step-n{width:26px;height:26px;border-radius:50%;background:var(--sky);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.imp-step .desc{font-size:13px;color:var(--muted);margin-bottom:18px;margin-left:36px}
+.drop{border:2px dashed var(--sky);border-radius:12px;padding:30px;text-align:center;background:var(--sky-soft);cursor:pointer;transition:.15s;margin-left:36px}
+.drop:hover{background:#dcf0f5}
+.drop.drag{background:#cfeaf1;border-color:var(--sky-deep)}
+.drop svg{width:36px;height:36px;color:var(--sky-deep);margin-bottom:10px}
+.drop .t{font-size:14px;font-weight:600;color:var(--ink)}
+.drop .s{font-size:12px;color:var(--muted);margin-top:4px}
+.file-tag{display:inline-flex;align-items:center;gap:8px;background:var(--green-soft);color:var(--green);font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:8px;margin:6px 6px 0 0}
+.map-grid{margin-left:36px;display:grid;gap:18px}
+.map-block{border:1px solid var(--line);border-radius:11px;padding:16px 18px}
+.map-block h4{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.map-block .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+.map-row{display:grid;grid-template-columns:1fr 1.2fr;gap:12px;align-items:center;margin-bottom:9px}
+.map-row label{font-size:13px;color:var(--ink);font-weight:500}
+.map-row label .req{color:var(--coral)}
+.map-row select{width:100%}
+.btn{padding:12px 22px;border:none;border-radius:10px;background:var(--coral);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:.15s}
+.btn:hover{background:#c23a2d}
+.btn:disabled{background:#c5ccd0;cursor:not-allowed}
+.btn-ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{background:var(--bg);border-color:var(--muted)}
+.imp-actions{margin-left:36px;margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+.imp-msg{margin-left:36px;margin-top:14px;font-size:13px;padding:11px 15px;border-radius:9px;display:none}
+.imp-msg.show{display:block}
+.imp-msg.ok{background:var(--green-soft);color:var(--green)}
+.imp-msg.err{background:var(--coral-soft);color:var(--coral)}
+.hist-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.hist-item:last-child{border:none}
+.hist-item .hic{width:34px;height:34px;border-radius:9px;background:var(--sky-soft);color:var(--sky-deep);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hist-item .hinfo{flex:1;min-width:0}
+.hist-item .hinfo .ht{font-weight:600;font-size:13.5px}
+.hist-item .hinfo .hs{font-size:11.5px;color:var(--muted)}
+.hist-item .hdel{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--coral);font-family:inherit}
+.hist-item .hdel:hover{background:var(--coral-soft);border-color:var(--coral)}
+.warn-box{background:var(--amber-soft);border:1px solid #ecd9b0;border-radius:10px;padding:13px 16px;font-size:12.5px;color:#8a5a14;margin-bottom:20px;display:flex;gap:10px}
+.warn-box svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
 @media(max-width:880px){
   .app{grid-template-columns:1fr}
   .side{position:fixed;left:-260px;z-index:50;transition:left .2s;width:248px}
-  .side.show{left:0}
-  .menu-btn{display:flex!important}
-  .dent,.col-orc{display:none}
-  .content{padding:20px 16px 50px}
-  .topbar{padding:14px 16px}
+  .side.show{left:0}.menu-btn{display:flex!important}
+  .dent,.col-orc{display:none}.content{padding:20px 16px 50px}.topbar{padding:14px 16px}
+  .map-row{grid-template-columns:1fr}
 }
 .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;margin-right:12px}
-.menu-btn svg{width:20px;height:20px;color:var(--ink)}
+.menu-btn svg{width:20px;height:20px}
+
 </style>
 </head>
 <body>
+
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-logo"><svg viewBox="0 0 48 48" fill="none"><rect x="9" y="14" width="30" height="27" rx="6" stroke="#62bdd4" stroke-width="3"/><circle cx="24" cy="13" r="9.5" fill="#fff" stroke="#62bdd4" stroke-width="3"/><path d="M24 9.5c-1.4-2.4-5-1.8-5 1.1 0 1.9 2.4 3.6 5 5.4 2.6-1.8 5-3.5 5-5.4 0-2.9-3.6-3.5-5-1.1z" fill="#d94436"/><path d="M23.2 11h1.6v3.4h-1.6zM22.3 11.9h3.4v1.6h-3.4z" fill="#fff"/><circle cx="19" cy="26" r="2.4" fill="#62bdd4"/><circle cx="29" cy="26" r="2.4" fill="#62bdd4"/><path d="M18 31c2 2.4 10 2.4 12 0" stroke="#62bdd4" stroke-width="3" stroke-linecap="round"/></svg></div>
+    <h2>AmorSaúde Joinville</h2><p>Painel da Coordenação Odontológica</p>
+    <div class="lock-field"><input type="password" id="lockInput" placeholder="Digite a senha de acesso" autocomplete="off" autofocus></div>
+    <button class="lock-btn" id="lockBtn">Entrar</button>
+    <div class="lock-err" id="lockErr"></div>
+    <div class="lock-foot">Acesso restrito · dados confidenciais de pacientes</div>
+  </div>
+</div>
+
 <div class="app">
-  <!-- Sidebar -->
   <aside class="side" id="side">
     <div class="brand">
-      <div class="logo">
-        <svg viewBox="0 0 48 48" fill="none">
-          <rect x="9" y="14" width="30" height="27" rx="6" stroke="#62bdd4" stroke-width="3"/>
-          <circle cx="24" cy="13" r="9.5" fill="#fff" stroke="#62bdd4" stroke-width="3"/>
-          <path d="M24 9.5c-1.4-2.4-5-1.8-5 1.1 0 1.9 2.4 3.6 5 5.4 2.6-1.8 5-3.5 5-5.4 0-2.9-3.6-3.5-5-1.1z" fill="#d94436"/>
-          <path d="M23.2 11h1.6v3.4h-1.6zM22.3 11.9h3.4v1.6h-3.4z" fill="#fff"/>
-          <circle cx="19" cy="26" r="2.4" fill="#62bdd4"/><circle cx="29" cy="26" r="2.4" fill="#62bdd4"/>
-          <path d="M18 31c2 2.4 10 2.4 12 0" stroke="#62bdd4" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div>
-        <div class="name">AmorSaúde</div>
-        <div class="unit">Joinville · Odontologia</div>
-      </div>
+      <div class="logo"><svg viewBox="0 0 48 48" fill="none"><rect x="9" y="14" width="30" height="27" rx="6" stroke="#62bdd4" stroke-width="3"/><circle cx="24" cy="13" r="9.5" fill="#fff" stroke="#62bdd4" stroke-width="3"/><path d="M24 9.5c-1.4-2.4-5-1.8-5 1.1 0 1.9 2.4 3.6 5 5.4 2.6-1.8 5-3.5 5-5.4 0-2.9-3.6-3.5-5-1.1z" fill="#d94436"/><path d="M23.2 11h1.6v3.4h-1.6zM22.3 11.9h3.4v1.6h-3.4z" fill="#fff"/><circle cx="19" cy="26" r="2.4" fill="#62bdd4"/><circle cx="29" cy="26" r="2.4" fill="#62bdd4"/><path d="M18 31c2 2.4 10 2.4 12 0" stroke="#62bdd4" stroke-width="3" stroke-linecap="round"/></svg></div>
+      <div><div class="name">AmorSaúde</div><div class="unit">Joinville · Odontologia</div></div>
     </div>
     <nav>
       <div class="nav-label">Gestão</div>
-      <button class="nav-item on" data-view="overview">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-        Visão geral
-      </button>
-      <button class="nav-item" data-view="patients">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
-        Pacientes
-      </button>
-      <button class="nav-item" data-view="colabs">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5M17 17a3 3 0 1 0 6 0 3 3 0 0 0-6 0zM7 7a3 3 0 1 0-6 0 3 3 0 0 0 6 0z"/></svg>
-        Colaboradoras
-      </button>
-      <button class="nav-item" data-view="dentists">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5.5C10 3.5 6 3.5 6 8c0 4 1.5 5 2 9 .3 2.5 3 2.5 3 0 0-2 .5-3 1-3s1 1 1 3c0 2.5 2.7 2.5 3 0 .5-4 2-5 2-9 0-4.5-4-4.5-6-2.5z"/></svg>
-        Dentistas
-      </button>
-      <div class="nav-label">Revisão</div>
-      <button class="nav-item" data-view="pending">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Pendências
-        <span class="badge-n" id="pendCount">0</span>
-      </button>
+      <button class="nav-item on" data-view="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Visão geral</button>
+      <button class="nav-item" data-view="patients"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Pacientes</button>
+      <button class="nav-item" data-view="colabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5M17 17a3 3 0 1 0 6 0 3 3 0 0 0-6 0zM7 7a3 3 0 1 0-6 0 3 3 0 0 0 6 0z"/></svg>Colaboradoras</button>
+      <button class="nav-item" data-view="dentists"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5.5C10 3.5 6 3.5 6 8c0 4 1.5 5 2 9 .3 2.5 3 2.5 3 0 0-2 .5-3 1-3s1 1 1 3c0 2.5 2.7 2.5 3 0 .5-4 2-5 2-9 0-4.5-4-4.5-6-2.5z"/></svg>Dentistas</button>
+      <div class="nav-label">Dados</div>
+      <button class="nav-item" data-view="import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar dados</button>
+      <button class="nav-item" data-view="pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pendências<span class="badge-n" id="pendCount">0</span></button>
     </nav>
-    <div class="side-foot">
-      <div class="who"><span class="dot"></span> Iverson Richter</div>
-      <div>Coordenador odontológico</div>
-    </div>
+    <div class="side-foot"><div class="who"><span class="dot"></span> Iverson Richter</div><div>Coordenador odontológico</div></div>
   </aside>
 
-  <!-- Main -->
   <div class="main">
     <div class="topbar">
       <div style="display:flex;align-items:center">
         <button class="menu-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-        <div>
-          <div class="crumb" id="crumb">Gestão / Visão geral</div>
-          <h1 id="pageTitle">Visão geral</h1>
-        </div>
+        <div><div class="crumb" id="crumb">Gestão / Visão geral</div><h1 id="pageTitle">Visão geral</h1></div>
       </div>
       <div class="date" id="today"></div>
     </div>
-
     <div class="content">
-      <!-- OVERVIEW -->
+
+      <!-- período filter (shared, shown on data views) -->
+      <div class="controls" id="periodBar" style="margin-bottom:22px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Período:</div>
+        <select id="fPeriodo"><option value="">Todos os períodos</option></select>
+      </div>
+
       <section class="view active" id="view-overview">
         <div class="kpis" id="kpis"></div>
         <div class="grid2">
-          <div class="panel">
-            <div class="panel-h"><h2>Conversão de orçamentos</h2><span class="hint">por paciente orçado</span></div>
-            <div class="panel-b">
-              <div class="convbar" id="convbar"></div>
-              <div class="legend">
-                <span><i style="background:var(--green)"></i> Fechou venda</span>
-                <span><i style="background:var(--amber)"></i> Em aberto</span>
-                <span><i style="background:#b9c4c9"></i> Sem orçamento</span>
-              </div>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-h"><h2>Top colaboradoras</h2><span class="hint">valor aprovado</span></div>
-            <div class="panel-b"><ul class="rank" id="rankColab"></ul></div>
-          </div>
+          <div class="panel"><div class="panel-h"><h2>Conversão de orçamentos</h2><span class="hint">por paciente orçado</span></div>
+            <div class="panel-b"><div class="convbar" id="convbar"></div>
+              <div class="legend"><span><i style="background:var(--green)"></i> Fechou venda</span><span><i style="background:var(--amber)"></i> Em aberto</span><span><i style="background:#b9c4c9"></i> Sem orçamento</span></div>
+            </div></div>
+          <div class="panel"><div class="panel-h"><h2>Top colaboradoras</h2><span class="hint">valor aprovado</span></div>
+            <div class="panel-b"><ul class="rank" id="rankColab"></ul></div></div>
         </div>
       </section>
 
-      <!-- PATIENTS -->
       <section class="view" id="view-patients">
         <div class="controls">
-          <div class="search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input type="text" id="q" placeholder="Buscar paciente, colaboradora ou dentista…">
-          </div>
+          <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="text" id="q" placeholder="Buscar paciente, colaboradora ou dentista…"></div>
           <select id="fColab"><option value="">Todas as colaboradoras</option></select>
           <select id="fDent"><option value="">Todos os dentistas</option></select>
         </div>
@@ -285,267 +263,551 @@ td{padding:13px 18px;vertical-align:middle}
           <span class="pill" data-st="em_aberto">Em aberto <span class="ct"></span></span>
           <span class="pill" data-st="sem_orcamento">Sem orçamento <span class="ct"></span></span>
         </div>
-        <div class="tablecard">
-          <table>
-            <thead><tr>
-              <th data-sort="paciente">Paciente</th>
-              <th data-sort="colaboradora">Colaboradora</th>
-              <th data-sort="dentista" class="dent">Dentista avaliador</th>
-              <th data-sort="n_orcamentos" class="col-orc num">Orç.</th>
-              <th data-sort="val_aprovado" class="num">Aprovado</th>
-              <th data-sort="val_aberto" class="num">Em aberto</th>
-              <th data-sort="status">Status</th>
-            </tr></thead>
-            <tbody id="tb"></tbody>
-          </table>
-          <div class="empty" id="empty" style="display:none"><div class="big">Nenhum paciente encontrado</div><div>Ajuste a busca ou os filtros.</div></div>
-        </div>
+        <div class="tablecard"><table><thead><tr>
+          <th data-sort="paciente">Paciente</th><th data-sort="colaboradora">Colaboradora</th>
+          <th data-sort="dentista" class="dent">Dentista avaliador</th><th data-sort="n_orcamentos" class="col-orc num">Orç.</th>
+          <th data-sort="val_aprovado" class="num">Aprovado</th><th data-sort="val_aberto" class="num">Em aberto</th><th data-sort="status">Status</th>
+        </tr></thead><tbody id="tb"></tbody></table>
+        <div class="empty" id="empty" style="display:none"><div class="big">Nenhum paciente encontrado</div><div>Ajuste a busca ou os filtros.</div></div></div>
         <div class="count-foot"><span id="count"></span><span>Clique numa linha para ver os orçamentos item a item</span></div>
       </section>
 
-      <!-- COLABS -->
       <section class="view" id="view-colabs">
-        <div class="tablecard">
-          <table>
-            <thead><tr>
-              <th data-csort="nome">Colaboradora</th>
-              <th data-csort="pacientes" class="num">Pacientes</th>
-              <th data-csort="fechou" class="num">Fechou</th>
-              <th data-csort="conv" class="num">Conversão</th>
-              <th data-csort="aprovado" class="num">Valor aprovado</th>
-              <th data-csort="aberto" class="num">Em aberto</th>
-            </tr></thead>
-            <tbody id="tbColab"></tbody>
-          </table>
-        </div>
-        <div class="count-foot"><span id="countColab"></span><span>Vínculo via sistema de chamadas (Página 2)</span></div>
+        <div class="tablecard"><table><thead><tr>
+          <th data-csort="nome">Colaboradora</th><th data-csort="pacientes" class="num">Pacientes</th>
+          <th data-csort="fechou" class="num">Fechou</th><th data-csort="conv" class="num">Conversão</th>
+          <th data-csort="aprovado" class="num">Valor aprovado</th><th data-csort="aberto" class="num">Em aberto</th>
+        </tr></thead><tbody id="tbColab"></tbody></table></div>
+        <div class="count-foot"><span id="countColab"></span><span>Vínculo via sistema de chamadas</span></div>
       </section>
 
-      <!-- DENTISTS -->
       <section class="view" id="view-dentists">
-        <div class="tablecard">
-          <table>
-            <thead><tr>
-              <th data-dsort="nome">Dentista</th>
-              <th data-dsort="orcamentos" class="num">Orçamentos</th>
-              <th data-dsort="aprovados" class="num">Aprovados</th>
-              <th data-dsort="conv" class="num">Conversão</th>
-              <th data-dsort="aprovado" class="num">Valor aprovado</th>
-              <th data-dsort="total" class="num">Valor avaliado</th>
-            </tr></thead>
-            <tbody id="tbDent"></tbody>
-          </table>
-        </div>
-        <div class="count-foot"><span id="countDent"></span><span>Valores somados dos orçamentos da efetivação (Página 3)</span></div>
+        <div class="tablecard"><table><thead><tr>
+          <th data-dsort="nome">Dentista</th><th data-dsort="orcamentos" class="num">Orçamentos</th>
+          <th data-dsort="aprovados" class="num">Aprovados</th><th data-dsort="conv" class="num">Conversão</th>
+          <th data-dsort="aprovado" class="num">Valor aprovado</th><th data-dsort="total" class="num">Valor avaliado</th>
+        </tr></thead><tbody id="tbDent"></tbody></table></div>
+        <div class="count-foot"><span id="countDent"></span><span>Valores somados dos orçamentos da efetivação</span></div>
       </section>
 
-      <!-- PENDING -->
-      <section class="view" id="view-pending">
-        <div id="pendingBody"></div>
+      <!-- IMPORT VIEW -->
+      <section class="view" id="view-import">
+        <div class="warn-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>Os dados importados ficam salvos <b>apenas neste navegador, neste computador</b>. Em outro dispositivo será preciso importar de novo. Por conter dados de pacientes, use o botão <b>Limpar tudo</b> ao terminar em computadores compartilhados.</div></div>
+
+        <div class="imp-step">
+          <h2><span class="step-n">1</span> Subir as planilhas</h2>
+          <div class="desc">Um arquivo Excel com as 3 abas (Cadastro, Atendimento, Efetivação) — ou 3 arquivos separados. Aceita .xlsx, .xls e .csv.</div>
+          <div class="drop" id="drop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="t">Clique para escolher ou arraste os arquivos aqui</div>
+            <div class="s">Excel (.xlsx/.xls) ou CSV</div>
+          </div>
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" multiple style="display:none">
+          <div id="fileTags" style="margin-left:36px"></div>
+        </div>
+
+        <div class="imp-step" id="mapStep" style="display:none">
+          <h2><span class="step-n">2</span> Confirmar as colunas</h2>
+          <div class="desc">Diga qual coluna corresponde a cada informação. O sistema já tentou adivinhar — confira e ajuste se preciso. Campos com <span style="color:var(--coral)">*</span> são obrigatórios.</div>
+          <div class="map-grid" id="mapGrid"></div>
+        </div>
+
+        <div class="imp-step" id="periodStep" style="display:none">
+          <h2><span class="step-n">3</span> Cruzar e adicionar ao painel</h2>
+          <div class="desc">Dê um nome para este período (ex: "Junho/2026" ou "Semana 23") — ele aparecerá no filtro de período do painel.</div>
+          <div style="margin-left:36px"><div class="map-row" style="grid-template-columns:1fr 1.2fr;max-width:480px"><label>Nome do período <span class="req">*</span></label><input type="text" id="periodoNome" placeholder="Ex: Junho/2026" style="padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px"></div></div>
+          <div class="imp-actions">
+            <button class="btn" id="btnCruzar">Cruzar e adicionar ao painel</button>
+            <button class="btn btn-ghost" id="btnCancelar">Cancelar</button>
+          </div>
+          <div class="imp-msg" id="impMsg"></div>
+        </div>
+
+        <div class="imp-step">
+          <h2><span class="step-n" style="background:var(--muted)">≡</span> Importações no painel</h2>
+          <div class="desc">Períodos já carregados. Você pode remover qualquer um individualmente.</div>
+          <div style="margin-left:36px" id="histList"></div>
+          <div class="imp-actions"><button class="btn btn-ghost" id="btnLimparTudo" style="color:var(--coral);border-color:var(--coral-soft)">Limpar tudo</button></div>
+        </div>
       </section>
+
+      <section class="view" id="view-pending"><div id="pendingBody"></div></section>
     </div>
   </div>
 </div>
 
 <script>
-const DADOS = [{"paciente": "Alisson Vinícius dos Santos Pereira", "colaboradora": "Nicole Siqueira", "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": []}, {"paciente": "Alzemiro Sutil de Oliveira", "colaboradora": "Andressa Felix", "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": []}, {"paciente": "Anderson Vieira", "colaboradora": "Andressa Felix", "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Ariane Cristine Ribeiro", "colaboradora": null, "dentistas": ["Rec Angela Aparecida Scholtz Da Silva"], "n_orcamentos": 1, "val_aprovado": 255.0, "val_aberto": 0.0, "val_total": 255.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Angela Aparecida Scholtz Da Silva"}]}, {"paciente": "Bianca Inacio Padilha", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa", "Rec Raifany Patricia Furtado Santos"], "n_orcamentos": 2, "val_aprovado": 255.0, "val_aberto": 64.27, "val_total": 319.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": false, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}, {"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Raifany Patricia Furtado Santos"}]}, {"paciente": "Bruno Da Silva Sasse", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Camila Ieda Silverio", "colaboradora": null, "dentistas": ["Dra Sabrina Gabriely Baggio Rodrigues"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dra Sabrina Gabriely Baggio Rodrigues"}]}, {"paciente": "Catarinna Schull Verissimo", "colaboradora": null, "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": []}, {"paciente": "Debora Joaquim", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Denise Tania Fodi Gaieuski", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 126.0, "val_aberto": 0.0, "val_total": 126.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 126.0, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Diogo Schatzmann", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra Brenda Hoanna Borges De Mendonça"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 19.5, "val_total": 19.5, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 19.5, "aprovado": false, "erro": false, "dentista": "Dra Brenda Hoanna Borges De Mendonça"}]}, {"paciente": "Eliane Borba Da Trindade Klein", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Eliane Fatima Assunção", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 680.4, "val_total": 680.4, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 680.4, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Emily Shimohara", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Everaldo Pedro da Silva", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 139.57, "val_total": 139.57, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 139.57, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Geraldo De Borba Coelho", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra Amanda Helena Rabêlo"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Amanda Helena Rabêlo"}]}, {"paciente": "Helga Alves Souza", "colaboradora": "Iverson Richter", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 352.0, "val_total": 352.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Implantodontia", "valor": 352.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Icaro Ribeiro Mizerski", "colaboradora": "Nicole Siqueira", "dentistas": ["Rec Gabrielle Fernandes Gomes"], "n_orcamentos": 1, "val_aprovado": 255.0, "val_aberto": 0.0, "val_total": 255.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Gabrielle Fernandes Gomes"}]}, {"paciente": "Ines Preusser", "colaboradora": "Nicole Siqueira", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 463.0, "val_total": 463.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Implantodontia", "valor": 463.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Iorrana Cristina Bianchini", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Jairo Roni Tibola Do Amaral", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Josefa Nágyla Pereira Santos", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 606.0, "val_aberto": 0.0, "val_total": 606.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 606.0, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Juliane Lopes Da Fonseca", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Lais Bracovescz", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Luan Sergio De Lima Ribas", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Lucas De Oliveira", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Luciano Pianezzer", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Luisa Antunes Da Silva", "colaboradora": null, "dentistas": ["Dra. Natalia Paniz"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra. Natalia Paniz"}]}, {"paciente": "Luiz Sergio Do Nascimento Vinhorte", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 126.0, "val_aberto": 0.0, "val_total": 126.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 126.0, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Luís Antonio Pereira", "colaboradora": null, "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 3, "val_aprovado": 0.0, "val_aberto": 6228.06, "val_total": 6228.06, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Clínica Geral", "valor": 508.64, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Prótese", "valor": 5719.42, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Marcelo Alves Damaceno", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Maria Marlete Reinert", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 261.69, "val_total": 261.69, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 261.69, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Mariela Jaqueline Blanco De Larez", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Miriane Paula De Moura Cardoso", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Naiara Alessandra Tonet Cardoso", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Nathalya Katerynne Scholl Verissimo", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Osmar Da Cunha", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Otávio Da Silva Guimarães", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra. Natalia Paniz"], "n_orcamentos": 1, "val_aprovado": 461.0, "val_aberto": 0.0, "val_total": 461.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 461.0, "aprovado": true, "erro": false, "dentista": "Dra. Natalia Paniz"}]}, {"paciente": "Paulo Vitor De Almeida Araujo", "colaboradora": null, "dentistas": ["Dr Leandro Lemes da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr Leandro Lemes da Costa"}]}, {"paciente": "Próxima Página", "colaboradora": null, "dentistas": [], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "nan", "valor": NaN, "aprovado": false, "erro": false, "dentista": ""}]}, {"paciente": "Sandra Aparecida Marchi Do Amaral", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Sandra Estima Gonçalves", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 4692.54, "val_total": 4692.54, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 374.54, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Prótese", "valor": 4318.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Sandro Ciro Canuto Souza", "colaboradora": null, "dentistas": ["Dra Brenda Hoanna Borges De Mendonça"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 260.0, "val_total": 260.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Ortodontia", "valor": 260.0, "aprovado": false, "erro": false, "dentista": "Dra Brenda Hoanna Borges De Mendonça"}]}, {"paciente": "Sara Milena De Lima Gomes", "colaboradora": "Andressa Felix", "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": []}, {"paciente": "Silas Bernardo", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra. Natalia Paniz", "Rec Nicole Siqueira Monteiro Soares"], "n_orcamentos": 3, "val_aprovado": 255.0, "val_aberto": 227.38, "val_total": 482.38, "status": "fechou", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 227.27, "aprovado": false, "erro": false, "dentista": "Dra. Natalia Paniz"}, {"tratamento": "Clínica Geral", "valor": 0.11, "aprovado": false, "erro": false, "dentista": "Dra. Natalia Paniz"}, {"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Nicole Siqueira Monteiro Soares"}]}, {"paciente": "Solange Raymundo", "colaboradora": null, "dentistas": ["Dra. Natalia Paniz"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 620.1, "val_total": 620.1, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Ortodontia", "valor": 620.1, "aprovado": false, "erro": false, "dentista": "Dra. Natalia Paniz"}]}, {"paciente": "Solange Westphal Rosa", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.11, "val_total": 0.11, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.11, "aprovado": false, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}]}, {"paciente": "Stephanie Belegante", "colaboradora": null, "dentistas": ["Dra Ana Carolina Thompson Reategue"], "n_orcamentos": 1, "val_aprovado": 1142.0, "val_aberto": 0.0, "val_total": 1142.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 1142.0, "aprovado": true, "erro": false, "dentista": "Dra Ana Carolina Thompson Reategue"}]}, {"paciente": "Tamires Torre Francisco Da Costa", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 101.0, "val_aberto": 0.0, "val_total": 101.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 101.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}, {"paciente": "Teresinha Luísa Furtado", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 5779.6, "val_total": 5779.6, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Prótese", "valor": 5779.6, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Tânia Prestes de Medeiros", "colaboradora": "Nicole Siqueira", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": true, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Implantodontia", "valor": 0.0, "aprovado": false, "erro": true, "dentista": "Dr Andre Frederico"}]}, {"paciente": "Wanessa Da Cruz Moreira", "colaboradora": null, "dentistas": ["Dr Vitor Gabriel De Oliveira Mota"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr Vitor Gabriel De Oliveira Mota"}]}, {"paciente": "Yasmin Gomes Da Silva", "colaboradora": "Andressa Felix", "dentistas": ["Coor Andressa Felix Da Rosa", "Dra Brenda Hoanna Borges De Mendonça"], "n_orcamentos": 2, "val_aprovado": 255.0, "val_aberto": 175.27, "val_total": 430.27, "status": "fechou", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 175.27, "aprovado": false, "erro": false, "dentista": "Dra Brenda Hoanna Borges De Mendonça"}, {"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Coor Andressa Felix Da Rosa"}]}, {"paciente": "Yasmin Vidal Cabral", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.11, "val_aberto": 0.0, "val_total": 0.11, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.11, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}]}];
-const BRL = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const initials = n => n.split(' ').filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-const stLabel = {fechou:'Fechou', em_aberto:'Em aberto', sem_orcamento:'Sem orçamento'};
-const titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas',pending:'Pendências'};
-const crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas',pending:'Revisão / Pendências'};
 
+/* ============ ESTADO GLOBAL ============ */
+var STORE_KEY = "amorsaude_painel_dados_v1";
+var SEED = [{"paciente": "Alisson Vinícius dos Santos Pereira", "colaboradora": "Nicole Siqueira", "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": [], "periodo": "Importação inicial"}, {"paciente": "Alzemiro Sutil de Oliveira", "colaboradora": "Andressa Felix", "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": [], "periodo": "Importação inicial"}, {"paciente": "Anderson Vieira", "colaboradora": "Andressa Felix", "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Ariane Cristine Ribeiro", "colaboradora": null, "dentistas": ["Rec Angela Aparecida Scholtz Da Silva"], "n_orcamentos": 1, "val_aprovado": 255.0, "val_aberto": 0.0, "val_total": 255.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Angela Aparecida Scholtz Da Silva"}], "periodo": "Importação inicial"}, {"paciente": "Bianca Inacio Padilha", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa", "Rec Raifany Patricia Furtado Santos"], "n_orcamentos": 2, "val_aprovado": 255.0, "val_aberto": 64.27, "val_total": 319.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": false, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}, {"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Raifany Patricia Furtado Santos"}], "periodo": "Importação inicial"}, {"paciente": "Bruno Da Silva Sasse", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Camila Ieda Silverio", "colaboradora": null, "dentistas": ["Dra Sabrina Gabriely Baggio Rodrigues"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dra Sabrina Gabriely Baggio Rodrigues"}], "periodo": "Importação inicial"}, {"paciente": "Catarinna Schull Verissimo", "colaboradora": null, "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": [], "periodo": "Importação inicial"}, {"paciente": "Debora Joaquim", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Denise Tania Fodi Gaieuski", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 126.0, "val_aberto": 0.0, "val_total": 126.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 126.0, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Diogo Schatzmann", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra Brenda Hoanna Borges De Mendonça"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 19.5, "val_total": 19.5, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 19.5, "aprovado": false, "erro": false, "dentista": "Dra Brenda Hoanna Borges De Mendonça"}], "periodo": "Importação inicial"}, {"paciente": "Eliane Borba Da Trindade Klein", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Eliane Fatima Assunção", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 680.4, "val_total": 680.4, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 680.4, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Emily Shimohara", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Everaldo Pedro da Silva", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 139.57, "val_total": 139.57, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 139.57, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Geraldo De Borba Coelho", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra Amanda Helena Rabêlo"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Amanda Helena Rabêlo"}], "periodo": "Importação inicial"}, {"paciente": "Helga Alves Souza", "colaboradora": "Iverson Richter", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 352.0, "val_total": 352.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Implantodontia", "valor": 352.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Icaro Ribeiro Mizerski", "colaboradora": "Nicole Siqueira", "dentistas": ["Rec Gabrielle Fernandes Gomes"], "n_orcamentos": 1, "val_aprovado": 255.0, "val_aberto": 0.0, "val_total": 255.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Gabrielle Fernandes Gomes"}], "periodo": "Importação inicial"}, {"paciente": "Ines Preusser", "colaboradora": "Nicole Siqueira", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 463.0, "val_total": 463.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Implantodontia", "valor": 463.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Iorrana Cristina Bianchini", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Jairo Roni Tibola Do Amaral", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Josefa Nágyla Pereira Santos", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 606.0, "val_aberto": 0.0, "val_total": 606.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 606.0, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Juliane Lopes Da Fonseca", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Lais Bracovescz", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Luan Sergio De Lima Ribas", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Lucas De Oliveira", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Luciano Pianezzer", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Luisa Antunes Da Silva", "colaboradora": null, "dentistas": ["Dra. Natalia Paniz"], "n_orcamentos": 1, "val_aprovado": 64.27, "val_aberto": 0.0, "val_total": 64.27, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 64.27, "aprovado": true, "erro": false, "dentista": "Dra. Natalia Paniz"}], "periodo": "Importação inicial"}, {"paciente": "Luiz Sergio Do Nascimento Vinhorte", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 126.0, "val_aberto": 0.0, "val_total": 126.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 126.0, "aprovado": true, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Luís Antonio Pereira", "colaboradora": null, "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 3, "val_aprovado": 0.0, "val_aberto": 6228.06, "val_total": 6228.06, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Clínica Geral", "valor": 508.64, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Prótese", "valor": 5719.42, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Marcelo Alves Damaceno", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Maria Marlete Reinert", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 261.69, "val_total": 261.69, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 261.69, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Mariela Jaqueline Blanco De Larez", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Miriane Paula De Moura Cardoso", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Naiara Alessandra Tonet Cardoso", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Nathalya Katerynne Scholl Verissimo", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Osmar Da Cunha", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Otávio Da Silva Guimarães", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra. Natalia Paniz"], "n_orcamentos": 1, "val_aprovado": 461.0, "val_aberto": 0.0, "val_total": 461.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 461.0, "aprovado": true, "erro": false, "dentista": "Dra. Natalia Paniz"}], "periodo": "Importação inicial"}, {"paciente": "Paulo Vitor De Almeida Araujo", "colaboradora": null, "dentistas": ["Dr Leandro Lemes da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr Leandro Lemes da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Sandra Aparecida Marchi Do Amaral", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Sandra Estima Gonçalves", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 4692.54, "val_total": 4692.54, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 374.54, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Prótese", "valor": 4318.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Sandro Ciro Canuto Souza", "colaboradora": null, "dentistas": ["Dra Brenda Hoanna Borges De Mendonça"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 260.0, "val_total": 260.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Ortodontia", "valor": 260.0, "aprovado": false, "erro": false, "dentista": "Dra Brenda Hoanna Borges De Mendonça"}], "periodo": "Importação inicial"}, {"paciente": "Sara Milena De Lima Gomes", "colaboradora": "Andressa Felix", "dentistas": [], "n_orcamentos": 0, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "sem_orcamento", "no_cadastro": true, "tem_valor_erro": false, "itens": [], "periodo": "Importação inicial"}, {"paciente": "Silas Bernardo", "colaboradora": "Nicole Siqueira", "dentistas": ["Dra. Natalia Paniz", "Rec Nicole Siqueira Monteiro Soares"], "n_orcamentos": 3, "val_aprovado": 255.0, "val_aberto": 227.38, "val_total": 482.38, "status": "fechou", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 227.27, "aprovado": false, "erro": false, "dentista": "Dra. Natalia Paniz"}, {"tratamento": "Clínica Geral", "valor": 0.11, "aprovado": false, "erro": false, "dentista": "Dra. Natalia Paniz"}, {"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Rec Nicole Siqueira Monteiro Soares"}], "periodo": "Importação inicial"}, {"paciente": "Solange Raymundo", "colaboradora": null, "dentistas": ["Dra. Natalia Paniz"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 620.1, "val_total": 620.1, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Ortodontia", "valor": 620.1, "aprovado": false, "erro": false, "dentista": "Dra. Natalia Paniz"}], "periodo": "Importação inicial"}, {"paciente": "Solange Westphal Rosa", "colaboradora": null, "dentistas": ["Dra Evelyn Alberto Vasconcelos De Souza"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.11, "val_total": 0.11, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.11, "aprovado": false, "erro": false, "dentista": "Dra Evelyn Alberto Vasconcelos De Souza"}], "periodo": "Importação inicial"}, {"paciente": "Stephanie Belegante", "colaboradora": null, "dentistas": ["Dra Ana Carolina Thompson Reategue"], "n_orcamentos": 1, "val_aprovado": 1142.0, "val_aberto": 0.0, "val_total": 1142.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 1142.0, "aprovado": true, "erro": false, "dentista": "Dra Ana Carolina Thompson Reategue"}], "periodo": "Importação inicial"}, {"paciente": "Tamires Torre Francisco Da Costa", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 101.0, "val_aberto": 0.0, "val_total": 101.0, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 101.0, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}, {"paciente": "Teresinha Luísa Furtado", "colaboradora": "Andressa Felix", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 5779.6, "val_total": 5779.6, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Prótese", "valor": 5779.6, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Tânia Prestes de Medeiros", "colaboradora": "Nicole Siqueira", "dentistas": ["Dr Andre Frederico"], "n_orcamentos": 2, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": true, "tem_valor_erro": true, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": false, "erro": false, "dentista": "Dr Andre Frederico"}, {"tratamento": "Implantodontia", "valor": 0.0, "aprovado": false, "erro": true, "dentista": "Dr Andre Frederico"}], "periodo": "Importação inicial"}, {"paciente": "Wanessa Da Cruz Moreira", "colaboradora": null, "dentistas": ["Dr Vitor Gabriel De Oliveira Mota"], "n_orcamentos": 1, "val_aprovado": 0.0, "val_aberto": 0.0, "val_total": 0.0, "status": "em_aberto", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.0, "aprovado": true, "erro": false, "dentista": "Dr Vitor Gabriel De Oliveira Mota"}], "periodo": "Importação inicial"}, {"paciente": "Yasmin Gomes Da Silva", "colaboradora": "Andressa Felix", "dentistas": ["Coor Andressa Felix Da Rosa", "Dra Brenda Hoanna Borges De Mendonça"], "n_orcamentos": 2, "val_aprovado": 255.0, "val_aberto": 175.27, "val_total": 430.27, "status": "fechou", "no_cadastro": true, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 175.27, "aprovado": false, "erro": false, "dentista": "Dra Brenda Hoanna Borges De Mendonça"}, {"tratamento": "DENTALVIDAS", "valor": 255.0, "aprovado": true, "erro": false, "dentista": "Coor Andressa Felix Da Rosa"}], "periodo": "Importação inicial"}, {"paciente": "Yasmin Vidal Cabral", "colaboradora": null, "dentistas": ["Dr José Luís Wessler Da Costa"], "n_orcamentos": 1, "val_aprovado": 0.11, "val_aberto": 0.0, "val_total": 0.11, "status": "fechou", "no_cadastro": false, "tem_valor_erro": false, "itens": [{"tratamento": "Clínica Geral", "valor": 0.11, "aprovado": true, "erro": false, "dentista": "Dr José Luís Wessler Da Costa"}], "periodo": "Importação inicial"}];
+var DADOS = [];        // todos os registros (todas importações)
+var IMPORTS = [];      // metadados das importações [{id,nome,n,data}]
+
+/* tentar carregar do navegador; se vazio, usar SEED como importação inicial */
+function loadStore(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw){
+      var obj = JSON.parse(raw);
+      DADOS = obj.dados||[]; IMPORTS = obj.imports||[];
+      return;
+    }
+  }catch(e){}
+  // primeira vez: semear com os dados originais
+  DADOS = SEED.map(function(r){return r;});
+  IMPORTS = [{id:"seed", nome:"Importação inicial", n:SEED.length, data:new Date().toISOString()}];
+  saveStore();
+}
+function saveStore(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({dados:DADOS, imports:IMPORTS})); }
+  catch(e){ console.warn("Não foi possível salvar:", e); }
+}
+
+/* ============ HELPERS ============ */
+var BRL = function(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});};
+var initials = function(n){return n.split(' ').filter(function(w){return w.length>2;}).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();};
+var stLabel = {fechou:'Fechou', em_aberto:'Em aberto', sem_orcamento:'Sem orçamento'};
+var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas',import:'Importar dados',pending:'Pendências'};
+var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas',import:'Dados / Importar',pending:'Revisão / Pendências'};
+function norm(s){ if(!s) return ""; return s.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
+function titlecase(s){ if(!s) return ""; var low=['de','da','do','das','dos','e']; return s.toString().trim().split(/\s+/).map(function(w){var l=w.toLowerCase(); return low.indexOf(l)>=0?l:(l.charAt(0).toUpperCase()+l.slice(1));}).join(' '); }
+
+/* período atualmente filtrado */
+var periodoFiltro = "";
+function dadosFiltrados(){ return periodoFiltro ? DADOS.filter(function(r){return r.periodo===periodoFiltro;}) : DADOS; }
+
+/* ============ NAV ============ */
 document.getElementById('today').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
-/* ---------- Navigation ---------- */
-document.querySelectorAll('.nav-item').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+document.querySelectorAll('.nav-item').forEach(function(b){b.onclick=function(){
+  document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('on');});
   b.classList.add('on');
-  const v=b.dataset.view;
-  document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
+  var v=b.dataset.view;
+  document.querySelectorAll('.view').forEach(function(s){s.classList.remove('active');});
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('pageTitle').textContent=titleOf[v];
   document.getElementById('crumb').textContent=crumbOf[v];
+  document.getElementById('periodBar').style.display = (v==='import')?'none':'flex';
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
-});
-document.getElementById('menuBtn').onclick=()=>document.getElementById('side').classList.toggle('show');
+};});
+document.getElementById('menuBtn').onclick=function(){document.getElementById('side').classList.toggle('show');};
 
-/* ---------- Derived aggregates ---------- */
-const totAprov=DADOS.reduce((s,r)=>s+r.val_aprovado,0);
-const totAberto=DADOS.reduce((s,r)=>s+r.val_aberto,0);
-const orcados=DADOS.filter(r=>r.n_orcamentos>0).length;
-const fechouN=DADOS.filter(r=>r.status==='fechou').length;
-const abertoN=DADOS.filter(r=>r.status==='em_aberto').length;
-const semN=DADOS.filter(r=>r.status==='sem_orcamento').length;
-const convPct=orcados?Math.round(fechouN/orcados*100):0;
-
-/* ---------- KPIs ---------- */
-const ICN={
+/* ============ RENDER PRINCIPAL (recalcula tudo) ============ */
+var ICN={
   users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
   check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
   money:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
   clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'
 };
-document.getElementById('kpis').innerHTML=`
-  <div class="kpi k-sky"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICN.users}</svg></div>
-    <div class="lbl">Pacientes no período</div><div class="val">${DADOS.length}</div><div class="sub">${orcados} com orçamento registrado</div></div>
-  <div class="kpi k-green"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICN.check}</svg></div>
-    <div class="lbl">Fecharam venda</div><div class="val">${fechouN} <small>/ ${orcados}</small></div><div class="sub">${convPct}% de conversão</div></div>
-  <div class="kpi k-coral"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICN.money}</svg></div>
-    <div class="lbl">Valor aprovado</div><div class="val">${BRL(totAprov)}</div><div class="sub">efetivado no período</div></div>
-  <div class="kpi k-amber"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICN.clock}</svg></div>
-    <div class="lbl">Valor em aberto</div><div class="val">${BRL(totAberto)}</div><div class="sub">orçado, aguardando fechamento</div></div>`;
 
-/* ---------- Conversion bar ---------- */
-const tot=DADOS.length;
-const pf=fechouN/tot*100, pa=abertoN/tot*100, ps=semN/tot*100;
-document.getElementById('convbar').innerHTML=`
-  <div class="seg s-fechou" style="width:${pf}%">${fechouN>0?fechouN:''}</div>
-  <div class="seg s-aberto" style="width:${pa}%">${abertoN>0?abertoN:''}</div>
-  <div class="seg s-sem" style="width:${ps}%">${semN>0?semN:''}</div>`;
+function renderAll(){
+  var D = dadosFiltrados();
+  /* KPIs */
+  var totAprov=D.reduce(function(s,r){return s+r.val_aprovado;},0);
+  var totAberto=D.reduce(function(s,r){return s+r.val_aberto;},0);
+  var orcados=D.filter(function(r){return r.n_orcamentos>0;}).length;
+  var fechouN=D.filter(function(r){return r.status==='fechou';}).length;
+  var abertoN=D.filter(function(r){return r.status==='em_aberto';}).length;
+  var semN=D.filter(function(r){return r.status==='sem_orcamento';}).length;
+  var convPct=orcados?Math.round(fechouN/orcados*100):0;
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi k-sky"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+ICN.users+'</svg></div><div class="lbl">Pacientes no período</div><div class="val">'+D.length+'</div><div class="sub">'+orcados+' com orçamento registrado</div></div>'+
+    '<div class="kpi k-green"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+ICN.check+'</svg></div><div class="lbl">Fecharam venda</div><div class="val">'+fechouN+' <small>/ '+orcados+'</small></div><div class="sub">'+convPct+'% de conversão</div></div>'+
+    '<div class="kpi k-coral"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+ICN.money+'</svg></div><div class="lbl">Valor aprovado</div><div class="val">'+BRL(totAprov)+'</div><div class="sub">efetivado no período</div></div>'+
+    '<div class="kpi k-amber"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+ICN.clock+'</svg></div><div class="lbl">Valor em aberto</div><div class="val">'+BRL(totAberto)+'</div><div class="sub">orçado, aguardando fechamento</div></div>';
+  /* conv bar */
+  var tot=D.length||1;
+  document.getElementById('convbar').innerHTML=
+    '<div class="seg s-fechou" style="width:'+(fechouN/tot*100)+'%">'+(fechouN>0?fechouN:'')+'</div>'+
+    '<div class="seg s-aberto" style="width:'+(abertoN/tot*100)+'%">'+(abertoN>0?abertoN:'')+'</div>'+
+    '<div class="seg s-sem" style="width:'+(semN/tot*100)+'%">'+(semN>0?semN:'')+'</div>';
+  /* ranking */
+  var CA=colabAgg(D);
+  document.getElementById('rankColab').innerHTML = CA.slice().sort(function(a,b){return b.aprovado-a.aprovado;}).slice(0,5).map(function(c){
+    return '<li><span class="av">'+initials(c.nome)+'</span><span class="nm">'+c.nome+'<small>'+c.pacientes+' pacientes · '+c.fechou+' fechados</small></span><span class="mt">'+BRL(c.aprovado)+'<small>'+c.conv+'% conv.</small></span></li>';
+  }).join('') || '<li style="color:var(--muted)">Sem colaboradoras vinculadas neste período.</li>';
+  renderColab(); renderDent(); renderP(); renderPending(); refreshPills();
+}
 
-/* ---------- Colab aggregate ---------- */
-function colabAgg(){
-  const m={};
-  DADOS.forEach(r=>{
-    if(!r.colaboradora) return;
-    const k=r.colaboradora;
+/* ============ AGREGADOS ============ */
+function colabAgg(D){
+  var m={};
+  D.forEach(function(r){ if(!r.colaboradora) return; var k=r.colaboradora;
     m[k]=m[k]||{nome:k,pacientes:0,fechou:0,aprovado:0,aberto:0};
-    m[k].pacientes++;
-    if(r.status==='fechou')m[k].fechou++;
-    m[k].aprovado+=r.val_aprovado; m[k].aberto+=r.val_aberto;
-  });
-  return Object.values(m).map(c=>({...c,conv:c.pacientes?Math.round(c.fechou/c.pacientes*100):0}));
+    m[k].pacientes++; if(r.status==='fechou')m[k].fechou++;
+    m[k].aprovado+=r.val_aprovado; m[k].aberto+=r.val_aberto; });
+  return Object.keys(m).map(function(k){var c=m[k]; c.conv=c.pacientes?Math.round(c.fechou/c.pacientes*100):0; return c;});
 }
-const CA=colabAgg();
-
-/* Top ranking */
-document.getElementById('rankColab').innerHTML=[...CA].sort((a,b)=>b.aprovado-a.aprovado).slice(0,5).map(c=>`
-  <li><span class="av">${initials(c.nome)}</span>
-    <span class="nm">${c.nome}<small>${c.pacientes} pacientes · ${c.fechou} fechados</small></span>
-    <span class="mt">${BRL(c.aprovado)}<small>${c.conv}% conv.</small></span></li>`).join('')
-  || '<li style="color:var(--muted)">Sem colaboradoras vinculadas.</li>';
-
-/* Colab table */
-let cSort='aprovado',cDir=-1;
-function renderColab(){
-  const rows=[...CA].sort((a,b)=>{const x=a[cSort],y=b[cSort];return (typeof x==='string'?x.localeCompare(y,'pt-BR'):x-y)*cDir;});
-  document.getElementById('tbColab').innerHTML=rows.map(c=>`<tr>
-    <td class="pac"><span class="colab"><span class="av-sm">${initials(c.nome)}</span>${c.nome}</span></td>
-    <td class="num">${c.pacientes}</td><td class="num">${c.fechou}</td>
-    <td class="num"><span class="badge ${c.conv>=50?'fechou':c.conv>0?'em_aberto':'sem_orcamento'}">${c.conv}%</span></td>
-    <td class="num big" style="color:var(--green)">${c.aprovado?BRL(c.aprovado):'—'}</td>
-    <td class="num" style="color:var(--amber)">${c.aberto?BRL(c.aberto):'—'}</td></tr>`).join('');
-  document.getElementById('countColab').textContent=`${rows.length} colaboradoras`;
-}
-document.querySelectorAll('[data-csort]').forEach(th=>th.onclick=()=>{const s=th.dataset.csort;if(cSort===s)cDir*=-1;else{cSort=s;cDir=s==='nome'?1:-1;}renderColab();});
-renderColab();
-
-/* ---------- Dentist aggregate ---------- */
-function dentAgg(){
-  const m={};
-  DADOS.forEach(r=>r.itens.forEach(it=>{
-    if(!it.dentista)return;
-    const k=it.dentista;
+function dentAgg(D){
+  var m={};
+  D.forEach(function(r){ (r.itens||[]).forEach(function(it){ if(!it.dentista) return; var k=it.dentista;
     m[k]=m[k]||{nome:k,orcamentos:0,aprovados:0,aprovado:0,total:0};
-    m[k].orcamentos++;
-    if(it.aprovado)m[k].aprovados++;
-    if(!it.erro){m[k].total+=it.valor;if(it.aprovado)m[k].aprovado+=it.valor;}
-  }));
-  return Object.values(m).map(d=>({...d,conv:d.orcamentos?Math.round(d.aprovados/d.orcamentos*100):0}));
+    m[k].orcamentos++; if(it.aprovado)m[k].aprovados++;
+    if(!it.erro){ m[k].total+=(it.valor||0); if(it.aprovado)m[k].aprovado+=(it.valor||0);} });});
+  return Object.keys(m).map(function(k){var d=m[k]; d.conv=d.orcamentos?Math.round(d.aprovados/d.orcamentos*100):0; return d;});
 }
-const DA=dentAgg();
-let dSort='total',dDir=-1;
+
+var cSort='aprovado',cDir=-1;
+function renderColab(){
+  var rows=colabAgg(dadosFiltrados()).sort(function(a,b){var x=a[cSort],y=b[cSort];return (typeof x==='string'?x.localeCompare(y,'pt-BR'):x-y)*cDir;});
+  document.getElementById('tbColab').innerHTML=rows.map(function(c){
+    return '<tr><td class="pac"><span class="colab"><span class="av-sm">'+initials(c.nome)+'</span>'+c.nome+'</span></td><td class="num">'+c.pacientes+'</td><td class="num">'+c.fechou+'</td><td class="num"><span class="badge '+(c.conv>=50?'fechou':c.conv>0?'em_aberto':'sem_orcamento')+'">'+c.conv+'%</span></td><td class="num big" style="color:var(--green)">'+(c.aprovado?BRL(c.aprovado):'—')+'</td><td class="num" style="color:var(--amber)">'+(c.aberto?BRL(c.aberto):'—')+'</td></tr>';
+  }).join('') || '<tr><td colspan="6" class="empty">Sem colaboradoras neste período.</td></tr>';
+  document.getElementById('countColab').textContent=rows.length+' colaboradoras';
+}
+var dSort='total',dDir=-1;
 function renderDent(){
-  const rows=[...DA].sort((a,b)=>{const x=a[dSort],y=b[dSort];return (typeof x==='string'?x.localeCompare(y,'pt-BR'):x-y)*dDir;});
-  document.getElementById('tbDent').innerHTML=rows.map(d=>`<tr>
-    <td class="pac">${d.nome}</td>
-    <td class="num">${d.orcamentos}</td><td class="num">${d.aprovados}</td>
-    <td class="num"><span class="badge ${d.conv>=50?'fechou':d.conv>0?'em_aberto':'sem_orcamento'}">${d.conv}%</span></td>
-    <td class="num big" style="color:var(--green)">${d.aprovado?BRL(d.aprovado):'—'}</td>
-    <td class="num">${d.total?BRL(d.total):'—'}</td></tr>`).join('');
-  document.getElementById('countDent').textContent=`${rows.length} dentistas`;
+  var rows=dentAgg(dadosFiltrados()).sort(function(a,b){var x=a[dSort],y=b[dSort];return (typeof x==='string'?x.localeCompare(y,'pt-BR'):x-y)*dDir;});
+  document.getElementById('tbDent').innerHTML=rows.map(function(d){
+    return '<tr><td class="pac">'+d.nome+'</td><td class="num">'+d.orcamentos+'</td><td class="num">'+d.aprovados+'</td><td class="num"><span class="badge '+(d.conv>=50?'fechou':d.conv>0?'em_aberto':'sem_orcamento')+'">'+d.conv+'%</span></td><td class="num big" style="color:var(--green)">'+(d.aprovado?BRL(d.aprovado):'—')+'</td><td class="num">'+(d.total?BRL(d.total):'—')+'</td></tr>';
+  }).join('') || '<tr><td colspan="6" class="empty">Sem dentistas neste período.</td></tr>';
+  document.getElementById('countDent').textContent=rows.length+' dentistas';
 }
-document.querySelectorAll('[data-dsort]').forEach(th=>th.onclick=()=>{const s=th.dataset.dsort;if(dSort===s)dDir*=-1;else{dSort=s;dDir=s==='nome'?1:-1;}renderDent();});
-renderDent();
 
-/* ---------- Patients table ---------- */
-const fc=document.getElementById('fColab'),fd=document.getElementById('fDent');
-[...new Set(DADOS.map(r=>r.colaboradora).filter(Boolean))].sort().forEach(c=>fc.innerHTML+=`<option>${c}</option>`);
-[...new Set(DADOS.flatMap(r=>r.dentistas))].sort().forEach(d=>fd.innerHTML+=`<option>${d}</option>`);
-
-let ps_={q:'',colab:'',dent:'',st:'',sort:'val_aprovado',dir:-1,open:new Set()};
+/* ============ PACIENTES ============ */
+var ps_={q:'',colab:'',dent:'',st:'',sort:'val_aprovado',dir:-1,open:{}};
 function applyP(){
-  let rows=DADOS.filter(r=>{
+  var D=dadosFiltrados();
+  var rows=D.filter(function(r){
     if(ps_.st&&r.status!==ps_.st)return false;
     if(ps_.colab&&r.colaboradora!==ps_.colab)return false;
-    if(ps_.dent&&!r.dentistas.includes(ps_.dent))return false;
-    if(ps_.q){const q=ps_.q.toLowerCase();if(!((r.paciente+' '+(r.colaboradora||'')+' '+r.dentistas.join(' ')).toLowerCase().includes(q)))return false;}
+    if(ps_.dent&&(r.dentistas||[]).indexOf(ps_.dent)<0)return false;
+    if(ps_.q){var q=ps_.q.toLowerCase(); if((r.paciente+' '+(r.colaboradora||'')+' '+(r.dentistas||[]).join(' ')).toLowerCase().indexOf(q)<0)return false;}
     return true;
   });
-  const s=ps_.sort,d=ps_.dir;
-  rows.sort((a,b)=>{let x,y;
-    if(s==='dentista'){x=a.dentistas[0]||'';y=b.dentistas[0]||'';}
-    else if(s==='status'){const o={fechou:0,em_aberto:1,sem_orcamento:2};x=o[a.status];y=o[b.status];}
+  var s=ps_.sort,d=ps_.dir;
+  rows.sort(function(a,b){var x,y;
+    if(s==='dentista'){x=(a.dentistas||[])[0]||'';y=(b.dentistas||[])[0]||'';}
+    else if(s==='status'){var o={fechou:0,em_aberto:1,sem_orcamento:2};x=o[a.status];y=o[b.status];}
     else{x=a[s];y=b[s];}
     return (typeof x==='string'?x.localeCompare(y,'pt-BR'):x-y)*d;});
   return rows;
 }
 function renderP(){
-  const rows=applyP();
+  var rows=applyP();
   document.getElementById('empty').style.display=rows.length?'none':'block';
-  document.getElementById('tb').innerHTML=rows.map(r=>{
-    const idx=DADOS.indexOf(r),isOpen=ps_.open.has(idx);
-    const colab=r.colaboradora?`<span class="colab"><span class="av-sm">${initials(r.colaboradora)}</span>${r.colaboradora}</span>`:`<span class="colab none">não encontrada</span>`;
-    const dent=r.dentistas.length?r.dentistas.join(', '):'<span style="color:var(--muted)">—</span>';
-    const nocad=!r.no_cadastro?'<span class="nocad">fora do cadastro do dia</span>':'';
-    let detail='';
+  document.getElementById('tb').innerHTML=rows.map(function(r){
+    var idx=DADOS.indexOf(r), isOpen=ps_.open[idx];
+    var colab=r.colaboradora?'<span class="colab"><span class="av-sm">'+initials(r.colaboradora)+'</span>'+r.colaboradora+'</span>':'<span class="colab none">não encontrada</span>';
+    var dent=(r.dentistas&&r.dentistas.length)?r.dentistas.join(', '):'<span style="color:var(--muted)">—</span>';
+    var nocad=!r.no_cadastro?'<span class="nocad">fora do cadastro</span>':'';
+    var detail='';
     if(isOpen){
-      const items=r.itens.length?r.itens.map(it=>`<tr>
-        <td><span class="dot2 ${it.aprovado?'y':'n'}"></span>${it.aprovado?'Aprovado':'Em aberto'}</td>
-        <td>${it.tratamento}</td><td style="color:var(--muted)">${it.dentista||'—'}</td>
-        <td class="num">${it.erro?'<span class="flag">valor inválido</span>':BRL(it.valor)}</td></tr>`).join('')
-        :'<tr><td colspan="4" style="color:var(--muted)">Sem orçamentos na efetivação.</td></tr>';
-      detail=`<tr class="detail"><td colspan="7"><div class="detail-inner"><table>
-        <thead><tr><th>Status</th><th>Tratamento</th><th>Dentista</th><th class="num">Valor</th></tr></thead>
-        <tbody>${items}</tbody></table></div></td></tr>`;
+      var items=(r.itens&&r.itens.length)?r.itens.map(function(it){
+        return '<tr><td><span class="dot2 '+(it.aprovado?'y':'n')+'"></span>'+(it.aprovado?'Aprovado':'Em aberto')+'</td><td>'+it.tratamento+'</td><td style="color:var(--muted)">'+(it.dentista||'—')+'</td><td class="num">'+(it.erro?'<span class="flag">valor inválido</span>':BRL(it.valor))+'</td></tr>';
+      }).join(''):'<tr><td colspan="4" style="color:var(--muted)">Sem orçamentos na efetivação.</td></tr>';
+      detail='<tr class="detail"><td colspan="7"><div class="detail-inner"><table><thead><tr><th>Status</th><th>Tratamento</th><th>Dentista</th><th class="num">Valor</th></tr></thead><tbody>'+items+'</tbody></table></div></td></tr>';
     }
-    return `<tr class="clickable ${isOpen?'open':''}" data-i="${idx}">
-      <td class="pac">${r.paciente}${nocad}</td><td>${colab}</td><td class="dent">${dent}</td>
-      <td class="num col-orc">${r.n_orcamentos||'—'}</td>
-      <td class="num big" style="color:var(--green)">${r.val_aprovado?BRL(r.val_aprovado):'—'}</td>
-      <td class="num" style="color:var(--amber)">${r.val_aberto?BRL(r.val_aberto):'—'}</td>
-      <td><span class="badge ${r.status}">${stLabel[r.status]}</span></td></tr>${detail}`;
+    return '<tr class="clickable '+(isOpen?'open':'')+'" data-i="'+idx+'"><td class="pac">'+r.paciente+nocad+'</td><td>'+colab+'</td><td class="dent">'+dent+'</td><td class="num col-orc">'+(r.n_orcamentos||'—')+'</td><td class="num big" style="color:var(--green)">'+(r.val_aprovado?BRL(r.val_aprovado):'—')+'</td><td class="num" style="color:var(--amber)">'+(r.val_aberto?BRL(r.val_aberto):'—')+'</td><td><span class="badge '+r.status+'">'+stLabel[r.status]+'</span></td></tr>'+detail;
   }).join('');
-  document.getElementById('tb').querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=()=>{const i=+tr.dataset.i;ps_.open.has(i)?ps_.open.delete(i):ps_.open.add(i);renderP();});
-  document.getElementById('count').textContent=`${rows.length} de ${DADOS.length} pacientes`;
+  document.getElementById('tb').querySelectorAll('tr[data-i]').forEach(function(tr){tr.onclick=function(){var i=+tr.dataset.i; ps_.open[i]=!ps_.open[i]; renderP();};});
+  document.getElementById('count').textContent=rows.length+' de '+dadosFiltrados().length+' pacientes';
 }
-document.getElementById('q').oninput=e=>{ps_.q=e.target.value;renderP();};
-fc.onchange=e=>{ps_.colab=e.target.value;renderP();};
-fd.onchange=e=>{ps_.dent=e.target.value;renderP();};
-document.querySelectorAll('#pills .pill').forEach(p=>p.onclick=()=>{document.querySelectorAll('#pills .pill').forEach(x=>x.classList.remove('on'));p.classList.add('on');ps_.st=p.dataset.st;renderP();});
-document.querySelectorAll('#view-patients th[data-sort]').forEach(th=>th.onclick=()=>{const s=th.dataset.sort;if(ps_.sort===s)ps_.dir*=-1;else{ps_.sort=s;ps_.dir=(['paciente','colaboradora','dentista'].includes(s))?1:-1;}renderP();});
-document.querySelectorAll('#pills .pill').forEach(p=>{const st=p.dataset.st;p.querySelector('.ct').textContent=st?DADOS.filter(r=>r.status===st).length:DADOS.length;});
-renderP();
+function refreshPills(){
+  var D=dadosFiltrados();
+  document.querySelectorAll('#pills .pill').forEach(function(p){var st=p.dataset.st; p.querySelector('.ct').textContent=st?D.filter(function(r){return r.status===st;}).length:D.length;});
+}
+document.getElementById('q').oninput=function(e){ps_.q=e.target.value;renderP();};
+document.getElementById('fColab').onchange=function(e){ps_.colab=e.target.value;renderP();};
+document.getElementById('fDent').onchange=function(e){ps_.dent=e.target.value;renderP();};
+document.querySelectorAll('#pills .pill').forEach(function(p){p.onclick=function(){document.querySelectorAll('#pills .pill').forEach(function(x){x.classList.remove('on');});p.classList.add('on');ps_.st=p.dataset.st;renderP();};});
+document.querySelectorAll('#view-patients th[data-sort]').forEach(function(th){th.onclick=function(){var s=th.dataset.sort;if(ps_.sort===s)ps_.dir*=-1;else{ps_.sort=s;ps_.dir=(['paciente','colaboradora','dentista'].indexOf(s)>=0)?1:-1;}renderP();};});
+document.querySelectorAll('[data-csort]').forEach(function(th){th.onclick=function(){var s=th.dataset.csort;if(cSort===s)cDir*=-1;else{cSort=s;cDir=s==='nome'?1:-1;}renderColab();};});
+document.querySelectorAll('[data-dsort]').forEach(function(th){th.onclick=function(){var s=th.dataset.dsort;if(dSort===s)dDir*=-1;else{dSort=s;dDir=s==='nome'?1:-1;}renderDent();};});
 
-/* ---------- Pending ---------- */
-const semColab=DADOS.filter(r=>!r.colaboradora&&r.n_orcamentos>0);
-const comErro=DADOS.filter(r=>r.tem_valor_erro);
-document.getElementById('pendCount').textContent=semColab.length+comErro.length;
-let pb='';
-if(comErro.length){
-  pb+=`<div class="pend-card coral"><h3>Valor inválido na origem <span class="tag">${comErro.length} caso</span></h3>
-    <p>Orçamento gravado como data na planilha de origem (vira um número fora de escala). Não é somado para não distorcer os totais — corrija o campo na planilha.</p>
-    <div class="pend-list">${comErro.map(r=>`<span class="chip">${r.paciente}</span>`).join('')}</div></div>`;
+/* ============ PENDÊNCIAS ============ */
+function renderPending(){
+  var D=dadosFiltrados();
+  var semColab=D.filter(function(r){return !r.colaboradora && r.n_orcamentos>0;});
+  var comErro=D.filter(function(r){return r.tem_valor_erro;});
+  document.getElementById('pendCount').textContent=semColab.length+comErro.length;
+  var pb='';
+  if(comErro.length){pb+='<div class="pend-card coral"><h3>Valor inválido na origem <span class="tag">'+comErro.length+' caso(s)</span></h3><p>Orçamento gravado como data na planilha de origem. Não é somado para não distorcer os totais — corrija na planilha.</p><div class="pend-list">'+comErro.map(function(r){return '<span class="chip">'+r.paciente+'</span>';}).join('')+'</div></div>';}
+  if(semColab.length){pb+='<div class="pend-card"><h3>Sem colaboradora vinculada <span class="tag">'+semColab.length+' paciente(s)</span></h3><p>Têm orçamento mas não aparecem no relatório de chamadas, então não foi possível identificar quem orçou.</p><div class="pend-list">'+semColab.map(function(r){return '<span class="chip">'+r.paciente+'</span>';}).join('')+'</div></div>';}
+  if(!pb)pb='<div class="empty"><div class="big">Tudo certo</div><div>Nenhuma pendência neste período.</div></div>';
+  document.getElementById('pendingBody').innerHTML=pb;
 }
-if(semColab.length){
-  pb+=`<div class="pend-card"><h3>Sem colaboradora vinculada <span class="tag">${semColab.length} pacientes</span></h3>
-    <p>Têm orçamento na efetivação, mas não aparecem no relatório do sistema de chamadas (Página 2), então não foi possível identificar quem orçou. Quando o nome constar nas chamadas, o vínculo é automático.</p>
-    <div class="pend-list">${semColab.map(r=>`<span class="chip">${r.paciente}</span>`).join('')}</div></div>`;
+
+/* ============ FILTROS GERAIS (período, selects) ============ */
+function rebuildFilters(){
+  var colabs=[]; var dents=[]; var periodos=[];
+  DADOS.forEach(function(r){
+    if(r.colaboradora&&colabs.indexOf(r.colaboradora)<0)colabs.push(r.colaboradora);
+    (r.dentistas||[]).forEach(function(d){if(dents.indexOf(d)<0)dents.push(d);});
+    if(r.periodo&&periodos.indexOf(r.periodo)<0)periodos.push(r.periodo);
+  });
+  colabs.sort(); dents.sort();
+  var fc=document.getElementById('fColab'); fc.innerHTML='<option value="">Todas as colaboradoras</option>'+colabs.map(function(c){return '<option>'+c+'</option>';}).join('');
+  var fd=document.getElementById('fDent'); fd.innerHTML='<option value="">Todos os dentistas</option>'+dents.map(function(d){return '<option>'+d+'</option>';}).join('');
+  var fp=document.getElementById('fPeriodo'); fp.innerHTML='<option value="">Todos os períodos</option>'+periodos.map(function(p){return '<option'+(p===periodoFiltro?' selected':'')+'>'+p+'</option>';}).join('');
 }
-if(!pb)pb='<div class="empty"><div class="big">Tudo certo</div><div>Nenhuma pendência de vínculo ou valor.</div></div>';
-document.getElementById('pendingBody').innerHTML=pb;
+document.getElementById('fPeriodo').onchange=function(e){periodoFiltro=e.target.value; ps_.colab='';ps_.dent='';ps_.q=''; document.getElementById('q').value=''; document.getElementById('fColab').value='';document.getElementById('fDent').value=''; renderAll();};
+
+/* ============ HISTÓRICO DE IMPORTAÇÕES ============ */
+function renderHist(){
+  var el=document.getElementById('histList');
+  if(!IMPORTS.length){el.innerHTML='<div style="color:var(--muted);font-size:13px">Nenhuma importação ainda.</div>';return;}
+  el.innerHTML=IMPORTS.map(function(im){
+    var dt=new Date(im.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    return '<div class="hist-item"><div class="hic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="hinfo"><div class="ht">'+im.nome+'</div><div class="hs">'+im.n+' pacientes · importado em '+dt+'</div></div><button class="hdel" data-id="'+im.id+'">Remover</button></div>';
+  }).join('');
+  el.querySelectorAll('.hdel').forEach(function(btn){btn.onclick=function(){removeImport(btn.dataset.id);};});
+}
+function removeImport(id){
+  var im=IMPORTS.find(function(x){return x.id===id;});
+  if(!im)return;
+  if(!confirm('Remover a importação "'+im.nome+'"? Os '+im.n+' registros dela sairão do painel.'))return;
+  DADOS=DADOS.filter(function(r){return r._imp!==id;});
+  IMPORTS=IMPORTS.filter(function(x){return x.id!==id;});
+  if(periodoFiltro && !DADOS.some(function(r){return r.periodo===periodoFiltro;})) periodoFiltro="";
+  saveStore(); rebuildFilters(); renderHist(); renderAll();
+}
+document.getElementById('btnLimparTudo').onclick=function(){
+  if(!confirm('Isso vai apagar TODOS os dados importados deste navegador. Tem certeza?'))return;
+  DADOS=[]; IMPORTS=[]; periodoFiltro=""; saveStore(); rebuildFilters(); renderHist(); renderAll();
+};
+
+/* ============ IMPORTAÇÃO (SheetJS) ============ */
+var ROLES=[
+  {key:'paciente', label:'Nome do paciente', req:true, sheets:['cadastro','atend','efet']},
+  {key:'colaboradora', label:'Colaboradora que orçou', req:false, sheets:['atend']},
+  {key:'valor', label:'Valor do orçamento', req:false, sheets:['efet']},
+  {key:'dt_aprov', label:'Data de aprovação', req:false, sheets:['efet']},
+  {key:'dt_orc', label:'Data do orçamento', req:false, sheets:['efet']},
+  {key:'tratamento', label:'Tratamento', req:false, sheets:['efet']},
+  {key:'dentista', label:'Dentista avaliador', req:false, sheets:['efet']}
+];
+var parsedSheets=[];  // [{name, headers:[], rows:[[]], guessRole:{}}]
+
+function guessRole(header){
+  var h=norm(header);
+  if(/paciente|nome|cliente/.test(h)) return 'paciente';
+  if(/colaborad|atendente|operador|usuario|usuário|vendedor/.test(h)) return 'colaboradora';
+  if(/valor|preco|preço|total|orcado|orçado|r\$/.test(h)) return 'valor';
+  if(/aprov/.test(h)) return 'dt_aprov';
+  if(/dt.*orc|data.*orc|orcamento|orçamento|emissao|emissão/.test(h)) return 'dt_orc';
+  if(/trat|procedimento|servico|serviço|especialidade/.test(h)) return 'tratamento';
+  if(/dentista|prestador|profissional|avaliador|doutor|dr\b/.test(h)) return 'dentista';
+  return '';
+}
+
+function handleFiles(files){
+  var tags=document.getElementById('fileTags'); 
+  var pending=files.length;
+  Array.prototype.forEach.call(files, function(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var data=new Uint8Array(e.target.result);
+        var wb=XLSX.read(data,{type:'array',cellDates:true});
+        wb.SheetNames.forEach(function(sn){
+          var ws=wb.Sheets[sn];
+          var arr=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,dateNF:'yyyy-mm-dd'});
+          // achar a linha de cabeçalho: primeira linha com >=2 células não vazias
+          var hi=0; for(var i=0;i<Math.min(arr.length,5);i++){ if(arr[i].filter(function(c){return (''+c).trim();}).length>=2){hi=i;break;} }
+          var headers=arr[hi].map(function(c,i){return (''+c).trim()|| ('Coluna '+(i+1));});
+          var rows=arr.slice(hi+1).filter(function(r){return r.some(function(c){return (''+c).trim();});});
+          var guess={}; headers.forEach(function(h){var g=guessRole(h); if(g&&!guess[g])guess[g]=h;});
+          parsedSheets.push({name:(file.name+' › '+sn), headers:headers, rows:rows, guess:guess, fname:file.name});
+        });
+        tags.innerHTML+='<span class="file-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>'+file.name+'</span>';
+      }catch(err){
+        tags.innerHTML+='<span class="file-tag" style="background:var(--coral-soft);color:var(--coral)">Erro ao ler '+file.name+'</span>';
+        console.error(err);
+      }
+      pending--; if(pending===0) buildMapUI();
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function buildMapUI(){
+  if(!parsedSheets.length)return;
+  var grid=document.getElementById('mapGrid'); grid.innerHTML='';
+  parsedSheets.forEach(function(sh, si){
+    var opts='<option value="">— não usar —</option>'+sh.headers.map(function(h){return '<option value="'+h.replace(/"/g,'&quot;')+'">'+h+'</option>';}).join('');
+    var rolesHtml=ROLES.map(function(role){
+      var sel=sh.guess[role.key]||'';
+      var optionsWithSel=opts.replace('value="'+sel.replace(/"/g,'&quot;')+'"','value="'+sel.replace(/"/g,'&quot;')+'" selected');
+      return '<div class="map-row"><label>'+role.label+(role.req?' <span class="req">*</span>':'')+'</label><select data-sheet="'+si+'" data-role="'+role.key+'">'+optionsWithSel+'</select></div>';
+    }).join('');
+    grid.innerHTML+='<div class="map-block"><h4>'+sh.name+'</h4><div class="sub">'+sh.rows.length+' linhas · '+sh.headers.length+' colunas detectadas</div>'+rolesHtml+'</div>';
+  });
+  document.getElementById('mapStep').style.display='block';
+  document.getElementById('periodStep').style.display='block';
+  document.getElementById('periodStep').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function getMapping(){
+  // junta papéis de todas as planilhas: para cada papel, acha (sheetIndex, header)
+  var map={};
+  document.querySelectorAll('#mapGrid select').forEach(function(sel){
+    var v=sel.value; if(!v)return;
+    var si=+sel.dataset.sheet, role=sel.dataset.role;
+    if(!map[role]) map[role]={si:si, header:v};
+  });
+  return map;
+}
+
+function colIndex(sheet, header){ return sheet.headers.indexOf(header); }
+
+function parseValor(v){
+  if(v===null||v===undefined||v==='') return {val:0, erro:false};
+  if(typeof v==='number') return {val:v, erro:false};
+  var s=(''+v).trim();
+  // detectar data (erro de digitação tipo 4452-01-01)
+  if(/^\d{3,4}-\d{2}-\d{2}/.test(s)) return {val:0, erro:true};
+  s=s.replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.');
+  var n=parseFloat(s);
+  if(isNaN(n)) return {val:0, erro:false};
+  return {val:n, erro:false};
+}
+function hasDate(v){
+  if(v===null||v===undefined||v==='') return false;
+  var s=(''+v).trim();
+  return s.length>0 && s.toLowerCase()!=='nan';
+}
+
+function cruzar(){
+  var map=getMapping();
+  var msg=document.getElementById('impMsg');
+  function showMsg(t,cls){msg.className='imp-msg show '+cls; msg.textContent=t;}
+  // validação
+  if(!map.paciente){ showMsg('Você precisa indicar a coluna do Nome do paciente em pelo menos uma planilha.','err'); return; }
+  var nome=document.getElementById('periodoNome').value.trim();
+  if(!nome){ showMsg('Dê um nome para este período.','err'); return; }
+
+  // construir índice de pacientes -> registro
+  // 1) coletar nomes de TODAS as planilhas que tiverem coluna paciente
+  var sheetsWithPac=[];
+  document.querySelectorAll('#mapGrid select[data-role="paciente"]').forEach(function(sel){ if(sel.value) sheetsWithPac.push({si:+sel.dataset.sheet, header:sel.value}); });
+
+  var registros={}; // key -> registro
+  function getReg(rawName){
+    var k=norm(rawName);
+    if(!k) return null;
+    if(!registros[k]) registros[k]={paciente:titlecase(rawName), key:k, colaboradora:null, dentistas:[], itens:[], no_cadastro:true};
+    return registros[k];
+  }
+
+  // 2) Cadastro: marca quem está no cadastro
+  // 3) Atendimento: pega colaboradora
+  // 4) Efetivação: pega orçamentos
+  // Determinar qual sheet é qual pelo que foi mapeado
+  var sCol = map.colaboradora ? parsedSheets[map.colaboradora.si] : null;
+  var sVal = map.valor ? parsedSheets[map.valor.si] : null;
+  var sApr = map.dt_aprov ? parsedSheets[map.dt_aprov.si] : null;
+
+  // primeiro: todos os nomes de todas as planilhas com paciente -> cria registro
+  sheetsWithPac.forEach(function(sp){
+    var sheet=parsedSheets[sp.si]; var ci=colIndex(sheet, sp.header);
+    sheet.rows.forEach(function(row){ var nm=row[ci]; if(norm(nm)) getReg(nm); });
+  });
+
+  // colaboradora
+  if(sCol && map.colaboradora){
+    var pacSelCol = document.querySelector('#mapGrid select[data-sheet="'+map.colaboradora.si+'"][data-role="paciente"]');
+    if(pacSelCol && pacSelCol.value){
+      var ciP=colIndex(sCol, pacSelCol.value), ciC=colIndex(sCol, map.colaboradora.header);
+      sCol.rows.forEach(function(row){ var reg=getReg(row[ciP]); if(reg && row[ciC] && norm(row[ciC])) { reg.colaboradora=titlecase(row[ciC]); } });
+    }
+  }
+
+  // efetivação (valor/aprovacao/tratamento/dentista) — usa a sheet do valor (ou da aprovação)
+  var sEf = sVal || sApr || (map.tratamento?parsedSheets[map.tratamento.si]:null);
+  if(sEf){
+    var efSi = sVal?map.valor.si:(sApr?map.dt_aprov.si:map.tratamento.si);
+    var pacSelEf=document.querySelector('#mapGrid select[data-sheet="'+efSi+'"][data-role="paciente"]');
+    if(pacSelEf && pacSelEf.value){
+      var ciPe=colIndex(sEf, pacSelEf.value);
+      var ciVal = map.valor?colIndex(sEf, map.valor.header):-1;
+      var ciApr = map.dt_aprov?colIndex(sEf, map.dt_aprov.header):-1;
+      var ciTra = map.tratamento?colIndex(sEf, map.tratamento.header):-1;
+      var ciDen = map.dentista?colIndex(sEf, map.dentista.header):-1;
+      sEf.rows.forEach(function(row){
+        var reg=getReg(row[ciPe]); if(!reg)return;
+        var pv = ciVal>=0?parseValor(row[ciVal]):{val:0,erro:false};
+        var aprovado = ciApr>=0?hasDate(row[ciApr]):false;
+        var trat = ciTra>=0?(''+row[ciTra]).trim():'Orçamento';
+        var dent = ciDen>=0?titlecase(row[ciDen]):'';
+        reg.itens.push({tratamento:trat||'Orçamento', valor:pv.val, aprovado:aprovado, erro:pv.erro, dentista:dent});
+        if(dent && reg.dentistas.indexOf(dent)<0) reg.dentistas.push(dent);
+      });
+    }
+  }
+
+  // finalizar registros: calcular agregados
+  var impId='imp_'+Date.now();
+  var novos=Object.keys(registros).map(function(k){
+    var r=registros[k];
+    var aprov=0, aberto=0, erroFlag=false;
+    r.itens.forEach(function(it){ if(it.erro){erroFlag=true;return;} if(it.aprovado)aprov+=it.valor; else aberto+=it.valor; });
+    var status = r.itens.length===0?'sem_orcamento':(aprov>0?'fechou':'em_aberto');
+    return {
+      paciente:r.paciente, colaboradora:r.colaboradora, dentistas:r.dentistas,
+      n_orcamentos:r.itens.length, val_aprovado:Math.round(aprov*100)/100, val_aberto:Math.round(aberto*100)/100,
+      val_total:Math.round((aprov+aberto)*100)/100, status:status, no_cadastro:false,
+      tem_valor_erro:erroFlag, itens:r.itens, periodo:nome, _imp:impId
+    };
+  });
+
+  if(!novos.length){ showMsg('Não encontrei pacientes válidos. Confira se a coluna do nome foi indicada corretamente.','err'); return; }
+
+  // adicionar (acumular)
+  novos.forEach(function(n){ DADOS.push(n); });
+  IMPORTS.push({id:impId, nome:nome, n:novos.length, data:new Date().toISOString()});
+  saveStore();
+  showMsg('Pronto! '+novos.length+' pacientes adicionados ao período "'+nome+'". Veja no painel.','ok');
+
+  // reset UI
+  parsedSheets=[];
+  document.getElementById('fileTags').innerHTML='';
+  document.getElementById('mapStep').style.display='none';
+  document.getElementById('periodoNome').value='';
+  rebuildFilters(); renderHist(); renderAll();
+  setTimeout(function(){document.getElementById('periodStep').style.display='none'; msg.className='imp-msg';},4000);
+}
+
+/* drag & drop + input */
+var drop=document.getElementById('drop'), fileInput=document.getElementById('fileInput');
+drop.onclick=function(){fileInput.click();};
+fileInput.onchange=function(e){ if(e.target.files.length) handleFiles(e.target.files); };
+['dragenter','dragover'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('drag');});});
+['dragleave','drop'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('drag');});});
+drop.addEventListener('drop',function(e){ if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
+document.getElementById('btnCruzar').onclick=cruzar;
+document.getElementById('btnCancelar').onclick=function(){
+  parsedSheets=[]; document.getElementById('fileTags').innerHTML='';
+  document.getElementById('mapStep').style.display='none';
+  document.getElementById('periodStep').style.display='none';
+  document.getElementById('periodoNome').value='';
+  document.getElementById('impMsg').className='imp-msg';
+};
+
+/* ============ LOGIN ============ */
+(function(){
+  var HASH="70f98d48e317d550803e1e8e1aad1bb3cc902b4d0905abf3d49f9dd51d00eff4";
+  function sha256(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");});}
+  function tryUnlock(){
+    var v=document.getElementById("lockInput").value; if(!v)return;
+    sha256(v).then(function(h){
+      if(h===HASH){ document.getElementById("lockScreen").classList.add("hidden"); boot(); }
+      else{ document.getElementById("lockErr").textContent="Senha incorreta. Tente novamente."; document.getElementById("lockInput").value=""; document.getElementById("lockInput").focus(); }
+    });
+  }
+  document.getElementById("lockBtn").addEventListener("click",tryUnlock);
+  document.getElementById("lockInput").addEventListener("keydown",function(e){if(e.key==="Enter")tryUnlock();});
+})();
+
+/* ============ BOOT ============ */
+var booted=false;
+function boot(){
+  if(booted)return; booted=true;
+  loadStore(); rebuildFilters(); renderHist(); renderAll();
+}
+
 </script>
 </body>
 </html>

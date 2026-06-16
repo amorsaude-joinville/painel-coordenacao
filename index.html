@@ -267,6 +267,31 @@ td{padding:13px 18px;vertical-align:middle}
 .nf-mark{background:none;border:1px solid var(--green);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--green);font-family:inherit}
 .nf-mark:hover{background:var(--green-soft);border-color:var(--green)}
 .nf-mark:disabled{opacity:.55;cursor:not-allowed}
+/* Meta do dia (mini-cards) */
+.meta-dia-h{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:6px 0 10px}
+.meta-dia-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.meta-dia-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.meta-dia-card .lbl{font-size:11.5px;color:var(--muted);font-weight:500;margin-bottom:6px}
+.meta-dia-card .val{font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.2}
+.meta-dia-card .sub{font-size:11.5px;color:var(--muted);margin-top:5px}
+.meta-dia-card.k-batido{background:var(--green-soft);border-color:#b8dfd1}
+.meta-dia-card.k-batido .val,.meta-dia-card.k-batido .lbl,.meta-dia-card.k-batido .sub{color:var(--green)}
+.meta-dia-card.k-sem .val{color:var(--muted);font-size:14px;font-weight:600}
+/* Feriados (dentro do modal de metas) */
+.feriados-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.feriados-section h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.feriados-section .desc{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.feriados-add-row{display:grid;grid-template-columns:160px 220px 1fr auto;gap:8px;align-items:center;margin-bottom:16px}
+@media(max-width:760px){.feriados-add-row{grid-template-columns:1fr}}
+.feriados-add-row input[type=date],.feriados-add-row input[type=text],.feriados-add-row select{padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;background:#fff}
+.feriados-add-row input:focus,.feriados-add-row select:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
+.feriados-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:13px;flex-wrap:wrap}
+.feriados-item .feriados-data{font-weight:600;min-width:90px}
+.feriados-item .feriados-tipo{font-size:10px;padding:3px 9px;border-radius:999px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.feriados-item .tipo-fechado{background:var(--coral-soft);color:var(--coral)}
+.feriados-item .tipo-meio{background:var(--amber-soft);color:var(--amber)}
+.feriados-item .feriados-desc{flex:1;color:var(--muted);min-width:100px}
+.feriados-empty{font-size:12.5px;color:var(--muted);padding:8px 0;font-style:italic}
 
 </style>
 </head>
@@ -608,6 +633,7 @@ td{padding:13px 18px;vertical-align:middle}
           <button id="btnCfgMetas" class="btn btn-ghost" style="font-size:13px;padding:8px 14px;display:none;margin-left:auto">⚙ Configurar metas</button>
         </div>
         <div class="kpis" id="desempKpis"></div>
+        <div id="desempMetaDia"></div>
         <div class="tablecard">
           <table>
             <thead><tr>
@@ -655,6 +681,22 @@ td{padding:13px 18px;vertical-align:middle}
               <button class="btn btn-ghost" id="btnFecharMetas">Fechar</button>
             </div>
             <div class="metas-msg" id="metasMsg"></div>
+
+            <div class="feriados-section">
+              <h3>Feriados (clínica fechada ou meio período)</h3>
+              <div class="desc">Feriados afetam o cálculo de dias úteis. "Fechado" não conta (peso 0); "Meio período" conta meio dia (peso 0,5). Domingos não contam e sábados normais valem 0,5.</div>
+              <div class="feriados-add-row">
+                <input type="date" id="feriadoData">
+                <select id="feriadoTipo">
+                  <option value="fechado">Fechado (não conta)</option>
+                  <option value="meio">Meio período (conta 0,5)</option>
+                </select>
+                <input type="text" id="feriadoDesc" placeholder="Descrição (opcional)" autocomplete="off">
+                <button class="btn" id="btnAddFeriado" style="padding:8px 14px;font-size:13px">Adicionar feriado</button>
+              </div>
+              <div id="feriadosLista"></div>
+              <div class="metas-msg" id="feriadosMsg"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -814,7 +856,7 @@ function ativarAba(v){
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
   try{ sessionStorage.setItem('amorsaude_ultima_aba', v); }catch(e){}
-  if(v==='desempenho'){ Promise.all([carregarProducao(), carregarMetas()]).then(desempRender); }
+  if(v==='desempenho'){ Promise.all([carregarProducao(), carregarMetas(), carregarFeriados()]).then(desempRender); }
   if(v==='nf'){ carregarOrcamentos().then(nfRender); }
   if(v==='producao'){ carregarProducao().then(producaoRefreshHeader); }
   return true;
@@ -1878,10 +1920,133 @@ async function excluirProducao(id){
   }
 }
 
+/* ==== META DO DIA (dias úteis com pesos) ==== */
+var FERIADOS_MAP = {}; // "AAAA-MM-DD" → {tipo:'fechado'|'meio', descricao:string}
+
+function pesoDia(date){
+  var y = date.getFullYear();
+  var m = String(date.getMonth()+1).padStart(2,'0');
+  var d = String(date.getDate()).padStart(2,'0');
+  var ymd = y+'-'+m+'-'+d;
+  var f = FERIADOS_MAP[ymd];
+  if(f){
+    if(f.tipo === 'fechado') return 0;          // fechado → 0
+    if(f.tipo === 'meio') return 0.5;            // meio período → 0.5
+  }
+  var dow = date.getDay();                       // 0=dom, 6=sáb
+  if(dow === 0) return 0;                        // domingo → 0
+  if(dow === 6) return 0.5;                      // sábado → 0.5
+  return 1.0;                                    // seg–sex → 1
+}
+
+async function carregarFeriados(){
+  try{
+    var snap = await db.collection('painel_feriados').get();
+    FERIADOS_MAP = {};
+    snap.forEach(function(doc){
+      var d = doc.data();
+      if(d && d.data) FERIADOS_MAP[d.data] = {tipo: d.tipo || 'fechado', descricao: d.descricao || ''};
+    });
+  }catch(e){
+    console.warn('Falha ao carregar feriados:', e);
+  }
+}
+
+function diasUteisDoMes(ano, mes){
+  // mes é 1-12
+  var d = new Date(ano, mes-1, 1);
+  var total = 0;
+  while(d.getMonth() === mes-1){
+    total += pesoDia(d);
+    d.setDate(d.getDate()+1);
+  }
+  return total;
+}
+
+function diasUteisRestantes(ano, mes, diaRef){
+  // mes é 1-12; diaRef é o dia (inclusive) a partir do qual contar
+  var hoje = new Date();
+  var hY = hoje.getFullYear(), hM = hoje.getMonth()+1;
+  // Mês passado → 0
+  if(ano < hY || (ano === hY && mes < hM)) return 0;
+  // Mês futuro → mês inteiro
+  if(ano > hY || (ano === hY && mes > hM)) return diasUteisDoMes(ano, mes);
+  // Mês corrente → soma a partir de diaRef (inclusive)
+  var d = new Date(ano, mes-1, diaRef);
+  var total = 0;
+  while(d.getMonth() === mes-1){
+    total += pesoDia(d);
+    d.setDate(d.getDate()+1);
+  }
+  return total;
+}
+
+function diasUteisRestantesMesRef(){
+  // Lê dFiltro.mes ou usa o mês de hoje
+  var hoje = new Date();
+  var mesHojeStr = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  var mesRef = dFiltro.mes || mesHojeStr;
+  var m = mesRef.match(/^(\d{4})-(\d{2})$/);
+  if(!m) return 0;
+  var ano = +m[1], mes = +m[2];
+  // diaRef: se for o mês corrente, hoje; senão 1 (mês futuro) ou 0 (mês passado, ignorado pela função)
+  var diaRef = (ano === hoje.getFullYear() && mes === hoje.getMonth()+1) ? hoje.getDate() : 1;
+  return diasUteisRestantes(ano, mes, diaRef);
+}
+
+function desempRenderMetaDia(rows){
+  var sums = {caixa:0, efetivacao:0, financiamento:0, life_essencial:0, life_orto:0};
+  rows.forEach(function(o){
+    sums.caixa += +o.caixa || 0;
+    sums.efetivacao += +o.efetivacao || 0;
+    sums.financiamento += +o.financiamento || 0;
+    sums.life_essencial += +o.life || 0;
+    sums.life_orto += +o.orto || 0;
+  });
+  var meta = metaAtual();
+  var diasRest = diasUteisRestantesMesRef();
+  function fmtVal(v, isMoney){
+    if(isMoney) return BRL(v);
+    return v.toLocaleString('pt-BR',{minimumFractionDigits:1, maximumFractionDigits:1});
+  }
+  function fmtDias(d){
+    return d.toLocaleString('pt-BR',{minimumFractionDigits:0, maximumFractionDigits:1});
+  }
+  function card(lbl, key, isMoney){
+    var metaMes = +meta[key] || 0;
+    var realizado = sums[key];
+    var faltante = Math.max(0, metaMes - realizado);
+    var cls = '', valStr, subTxt = '';
+    if(!metaMes){
+      valStr = 'sem meta'; cls = 'k-sem';
+    } else if(faltante <= 0){
+      valStr = isMoney ? BRL(0) : '0'; cls = 'k-batido'; subTxt = 'meta do mês batida';
+    } else if(diasRest <= 0){
+      valStr = '—'; subTxt = 'mês encerrado';
+    } else {
+      valStr = fmtVal(faltante / diasRest, isMoney);
+      subTxt = 'faltam '+fmtDias(diasRest)+' dia'+(diasRest===1?'':'s')+' útil'+(diasRest===1?'':'eis');
+    }
+    return '<div class="meta-dia-card '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+valStr+'</div>'+(subTxt?'<div class="sub">'+subTxt+'</div>':'')+'</div>';
+  }
+  var host = document.getElementById('desempMetaDia');
+  if(!host) return;
+  host.innerHTML =
+    '<div class="meta-dia-h">Meta do dia (para bater a meta do mês)</div>'
+    +'<div class="meta-dia-grid">'
+    + card('Caixa','caixa',true)
+    + card('Efetivação','efetivacao',true)
+    + card('Financiamento','financiamento',true)
+    + card('Life Essencial','life_essencial',false)
+    + card('Life Orto','life_orto',false)
+    +'</div>';
+}
+
 function desempRender(){
   desempRebuildFiltros();
   var rows = producaoFiltrada();
   desempRenderKPIs(rows);
+  desempRenderMetaDia(rows);
   desempRenderLista(rows);
 }
 
@@ -1999,6 +2164,84 @@ function metasModalBuildRows(mes){
   });
   document.getElementById('metasTbody').innerHTML = rows;
 }
+function feriadosRender(){
+  var host = document.getElementById('feriadosLista');
+  if(!host) return;
+  var keys = Object.keys(FERIADOS_MAP).sort();
+  if(!keys.length){
+    host.innerHTML = '<div class="feriados-empty">Nenhum feriado cadastrado.</div>';
+    return;
+  }
+  host.innerHTML = keys.map(function(data){
+    var f = FERIADOS_MAP[data];
+    var dd = fmtDataBR(data);
+    var tipoLbl = f.tipo === 'meio' ? 'Meio período' : 'Fechado';
+    var desc = (f.descricao||'').trim();
+    var descHtml = desc ? desc : '<span style="font-style:italic">sem descrição</span>';
+    return '<div class="feriados-item">'
+      +'<span class="feriados-data">'+dd+'</span>'
+      +'<span class="feriados-tipo tipo-'+f.tipo+'">'+tipoLbl+'</span>'
+      +'<span class="feriados-desc">'+descHtml+'</span>'
+      +'<button class="hdel feriado-remove" data-data="'+data+'">Remover</button>'
+      +'</div>';
+  }).join('');
+  host.querySelectorAll('button.feriado-remove').forEach(function(btn){
+    btn.onclick = function(){ feriadoRemove(btn.dataset.data); };
+  });
+}
+
+async function feriadoAdd(){
+  if(!USUARIO_ATUAL) return;
+  var p = USUARIO_ATUAL.perfil;
+  if(p !== 'gestora' && p !== 'coordenador') return;
+  var msg = document.getElementById('feriadosMsg');
+  function show(t,cls){ msg.className='metas-msg show '+cls; msg.textContent=t; }
+  var data = document.getElementById('feriadoData').value;
+  if(!data){ show('Informe a data do feriado.','err'); return; }
+  var tipo = document.getElementById('feriadoTipo').value;
+  if(tipo !== 'fechado' && tipo !== 'meio') tipo = 'fechado';
+  var descricao = document.getElementById('feriadoDesc').value.trim();
+  var btn = document.getElementById('btnAddFeriado'); btn.disabled = true;
+  try{
+    await db.collection('painel_feriados').doc(data).set({data:data, tipo:tipo, descricao:descricao});
+    FERIADOS_MAP[data] = {tipo:tipo, descricao:descricao};
+    document.getElementById('feriadoData').value = '';
+    document.getElementById('feriadoDesc').value = '';
+    document.getElementById('feriadoTipo').value = 'fechado';
+    feriadosRender();
+    show('Feriado cadastrado.','ok');
+    var vd = document.getElementById('view-desempenho');
+    if(vd && vd.classList.contains('active')) desempRender();
+  }catch(e){
+    console.warn('Falha ao salvar feriado:', e);
+    show('Erro ao salvar feriado ('+(e.message||e)+').','err');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function feriadoRemove(data){
+  if(!USUARIO_ATUAL) return;
+  var p = USUARIO_ATUAL.perfil;
+  if(p !== 'gestora' && p !== 'coordenador') return;
+  var f = FERIADOS_MAP[data];
+  if(!f) return;
+  if(!confirm('Remover o feriado '+fmtDataBR(data)+(f.descricao?' ('+f.descricao+')':'')+'?')) return;
+  var msg = document.getElementById('feriadosMsg');
+  function show(t,cls){ msg.className='metas-msg show '+cls; msg.textContent=t; }
+  try{
+    await db.collection('painel_feriados').doc(data).delete();
+    delete FERIADOS_MAP[data];
+    feriadosRender();
+    show('Feriado removido.','ok');
+    var vd = document.getElementById('view-desempenho');
+    if(vd && vd.classList.contains('active')) desempRender();
+  }catch(e){
+    console.warn('Falha ao remover feriado:', e);
+    show('Erro ao remover ('+(e.message||e)+').','err');
+  }
+}
+
 function metasModalOpen(){
   var hoje = new Date();
   var mesHoje = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
@@ -2007,6 +2250,9 @@ function metasModalOpen(){
   metasModalBuildRows(mes);
   document.getElementById('metasMsg').className = 'metas-msg';
   document.getElementById('metasMsg').textContent = '';
+  document.getElementById('feriadosMsg').className = 'metas-msg';
+  document.getElementById('feriadosMsg').textContent = '';
+  feriadosRender();
   document.getElementById('metasOverlay').classList.add('show');
 }
 function metasModalClose(){
@@ -2062,6 +2308,7 @@ function desempWire(){
   document.getElementById('metasOverlay').addEventListener('click', function(e){
     if(e.target === e.currentTarget) metasModalClose();
   });
+  document.getElementById('btnAddFeriado').addEventListener('click', feriadoAdd);
 }
 
 /* ============ NF (Notas Fiscais) ============ */
@@ -2211,7 +2458,7 @@ async function boot(){
   desempWire();
   nfWire();
   producaoWire();
-  await Promise.all([carregarOrcamentos(), carregarMetas(), carregarProducao()]);
+  await Promise.all([carregarOrcamentos(), carregarMetas(), carregarProducao(), carregarFeriados()]);
   desempRender();
   aplicarPermissoesMenu();
   try{

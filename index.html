@@ -263,6 +263,10 @@ td{padding:13px 18px;vertical-align:middle}
 .metas-msg.show{display:block}
 .metas-msg.ok{background:var(--green-soft);color:var(--green)}
 .metas-msg.err{background:var(--coral-soft);color:var(--coral)}
+/* Botão "Marcar emitida" na aba NF */
+.nf-mark{background:none;border:1px solid var(--green);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--green);font-family:inherit}
+.nf-mark:hover{background:var(--green-soft);border-color:var(--green)}
+.nf-mark:disabled{opacity:.55;cursor:not-allowed}
 
 </style>
 </head>
@@ -295,6 +299,7 @@ td{padding:13px 18px;vertical-align:middle}
       <div class="nav-label">Dados</div>
       <button class="nav-item" data-view="novo-orcamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Novo Orçamento</button>
       <button class="nav-item" data-view="desempenho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Desempenho</button>
+      <button class="nav-item" data-view="nf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>NF</button>
       <button class="nav-item" data-view="import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar dados</button>
       <button class="nav-item" data-view="pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pendências<span class="badge-n" id="pendCount">0</span></button>
     </nav>
@@ -608,6 +613,44 @@ td{padding:13px 18px;vertical-align:middle}
         </div>
       </section>
 
+      <!-- NF VIEW -->
+      <section class="view" id="view-nf">
+        <div class="controls" style="margin-bottom:18px">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Mês</label>
+          <select id="nfMes" style="font-size:13px;padding:9px 12px"></select>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Status</label>
+          <select id="nfStatus" style="font-size:13px;padding:9px 12px">
+            <option value="">Todos</option>
+            <option value="pendentes">Pendentes</option>
+            <option value="emitidas">Emitidas</option>
+          </select>
+          <span id="nfColabWrap" style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Colab.</label>
+            <select id="nfColab" style="font-size:13px;padding:9px 12px"></select>
+          </span>
+          <button id="btnLimparNf" class="btn btn-ghost" style="font-size:13px;padding:8px 14px">Limpar filtros</button>
+        </div>
+        <div class="kpis" id="nfKpis"></div>
+        <div class="tablecard">
+          <table>
+            <thead><tr>
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>CPF</th>
+              <th class="num">Valor</th>
+              <th>Colaboradora</th>
+              <th>Status NF</th>
+              <th>Ações</th>
+            </tr></thead>
+            <tbody id="tbNf"></tbody>
+          </table>
+          <div class="empty" id="nfEmpty" style="display:none">
+            <div class="big">Nenhuma nota fiscal neste filtro</div>
+            <div>Vendas 100% em dinheiro não entram neste controle.</div>
+          </div>
+        </div>
+      </section>
+
       <section class="view" id="view-pending"><div id="pendingBody"></div></section>
     </div>
   </div>
@@ -669,8 +712,8 @@ function saveStore(){
 var BRL = function(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});};
 var initials = function(n){return n.split(' ').filter(function(w){return w.length>2;}).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();};
 var stLabel = {fechou:'Fechou', em_aberto:'Em aberto', sem_orcamento:'Sem orçamento'};
-var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas','novo-orcamento':'Novo Orçamento',desempenho:'Desempenho',import:'Importar dados',pending:'Pendências'};
-var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas','novo-orcamento':'Dados / Novo Orçamento',desempenho:'Dados / Desempenho',import:'Dados / Importar',pending:'Revisão / Pendências'};
+var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas','novo-orcamento':'Novo Orçamento',desempenho:'Desempenho',nf:'NF',import:'Importar dados',pending:'Pendências'};
+var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas','novo-orcamento':'Dados / Novo Orçamento',desempenho:'Dados / Desempenho',nf:'Dados / NF',import:'Dados / Importar',pending:'Revisão / Pendências'};
 function norm(s){ if(!s) return ""; return s.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
 function titlecase(s){ if(!s) return ""; var low=['de','da','do','das','dos','e']; return s.toString().trim().split(/\s+/).map(function(w){var l=w.toLowerCase(); return low.indexOf(l)>=0?l:(l.charAt(0).toUpperCase()+l.slice(1));}).join(' '); }
 
@@ -700,12 +743,13 @@ function ativarAba(v){
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('pageTitle').textContent=titleOf[v];
   document.getElementById('crumb').textContent=crumbOf[v];
-  var semPeriodo=(v==='import'||v==='novo-orcamento'||v==='desempenho');
+  var semPeriodo=(v==='import'||v==='novo-orcamento'||v==='desempenho'||v==='nf');
   document.getElementById('periodBar').style.display=semPeriodo?'none':'flex';
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
   try{ sessionStorage.setItem('amorsaude_ultima_aba', v); }catch(e){}
   if(v==='desempenho'){ Promise.all([carregarOrcamentos(), carregarMetas()]).then(desempRender); }
+  if(v==='nf'){ carregarOrcamentos().then(nfRender); }
   return true;
 }
 document.querySelectorAll('.nav-item').forEach(function(b){
@@ -1886,6 +1930,143 @@ function desempWire(){
   });
 }
 
+/* ============ NF (Notas Fiscais) ============ */
+var nfFiltro = {mes:'', status:'', colab:''};
+
+function precisaNF(o){
+  var formas = Array.isArray(o.formas_pagamento) ? o.formas_pagamento : null;
+  if(!formas || formas.length === 0) return true;
+  return !formas.every(function(f){ return f.forma === 'Dinheiro'; });
+}
+
+function nfBase(){
+  return orcamentosVisiveis().filter(precisaNF);
+}
+
+function nfFiltrados(){
+  return nfBase().filter(function(o){
+    if(nfFiltro.mes && o.mes !== nfFiltro.mes) return false;
+    if(nfFiltro.colab && o.colaboradora !== nfFiltro.colab) return false;
+    if(nfFiltro.status === 'pendentes' && o.nf_emitida) return false;
+    if(nfFiltro.status === 'emitidas' && !o.nf_emitida) return false;
+    return true;
+  });
+}
+
+function nfRebuildFiltros(){
+  var base = nfBase();
+  var mesesMap={}, colabsMap={};
+  base.forEach(function(o){ if(o.mes) mesesMap[o.mes]=true; if(o.colaboradora) colabsMap[o.colaboradora]=true; });
+  var mesArr = Object.keys(mesesMap).sort().reverse();
+  var sm = document.getElementById('nfMes');
+  sm.innerHTML = '<option value="">Todos os meses</option>'+mesArr.map(function(m){return '<option value="'+m+'"'+(m===nfFiltro.mes?' selected':'')+'>'+mesPT(m)+'</option>';}).join('');
+  var sc = document.getElementById('nfColab');
+  var colArr = Object.keys(colabsMap).sort();
+  sc.innerHTML = '<option value="">Todas</option>'+colArr.map(function(c){return '<option'+(c===nfFiltro.colab?' selected':'')+'>'+c+'</option>';}).join('');
+  var wrap = document.getElementById('nfColabWrap');
+  var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  if(p==='gestora'||p==='coordenador'){ wrap.style.display='flex'; }
+  else { wrap.style.display='none'; nfFiltro.colab=''; sc.value=''; }
+}
+
+function nfRenderResumo(){
+  // Resumo aplica mês e colab, mas ignora o filtro de status (mostra sempre os 3 totais)
+  var rows = nfBase().filter(function(o){
+    if(nfFiltro.mes && o.mes !== nfFiltro.mes) return false;
+    if(nfFiltro.colab && o.colaboradora !== nfFiltro.colab) return false;
+    return true;
+  });
+  var pend = rows.filter(function(o){ return !o.nf_emitida; });
+  var emit = rows.filter(function(o){ return o.nf_emitida === true; });
+  var sum = function(arr){ return arr.reduce(function(s,o){ return s + (+o.total||0); }, 0); };
+  var totPend = sum(pend), totEmit = sum(emit), totGeral = totPend + totEmit;
+  function card(cls, lbl, qtd, valor){
+    return '<div class="kpi '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+qtd+'</div><div class="sub">'+BRL(valor)+'</div></div>';
+  }
+  document.getElementById('nfKpis').innerHTML =
+    card('k-amber','NF pendentes', pend.length, totPend) +
+    card('k-green','NF emitidas', emit.length, totEmit) +
+    card('k-sky','Total no controle', rows.length, totGeral);
+}
+
+function nfRenderLista(){
+  var rows = nfFiltrados();
+  var tb = document.getElementById('tbNf');
+  var emp = document.getElementById('nfEmpty');
+  if(!rows.length){ tb.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+  var sorted = rows.slice().sort(function(a,b){
+    var da=a.data_orcamento||'', dbb=b.data_orcamento||'';
+    if(da===dbb){ return (b.criado_em||'').localeCompare(a.criado_em||''); }
+    return da<dbb ? 1 : -1;
+  });
+  var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  var podeMarcar = (p==='gestora' || p==='coordenador');
+  tb.innerHTML = sorted.map(function(o){
+    var id = o._id || '';
+    var emitida = !!o.nf_emitida;
+    var badgeCls = emitida ? 'fechou' : 'em_aberto';
+    var badgeLbl = emitida ? 'NF emitida' : 'NF pendente';
+    var btn = '';
+    if(!emitida && podeMarcar){
+      btn = '<button class="nf-mark" data-id="'+id+'">Marcar emitida</button>';
+    }
+    return '<tr>'
+      +'<td>'+fmtDataBR(o.data_orcamento)+'</td>'
+      +'<td class="pac">'+(o.paciente||'—')+'</td>'
+      +'<td>'+(o.cpf||'—')+'</td>'
+      +'<td class="num big">'+BRL(+o.total||0)+'</td>'
+      +'<td>'+(o.colaboradora||'—')+'</td>'
+      +'<td><span class="badge '+badgeCls+'">'+badgeLbl+'</span></td>'
+      +'<td>'+btn+'</td>'
+      +'</tr>';
+  }).join('');
+  tb.querySelectorAll('button.nf-mark').forEach(function(btn){
+    btn.onclick = function(e){
+      e.stopPropagation();
+      marcarNFEmitida(btn.dataset.id);
+    };
+  });
+}
+
+async function marcarNFEmitida(id){
+  if(!USUARIO_ATUAL) return;
+  var p = USUARIO_ATUAL.perfil;
+  if(p !== 'gestora' && p !== 'coordenador') return;
+  var o = ORCAMENTOS.find(function(x){return x._id === id;});
+  if(!o) return;
+  if(!confirm('Marcar a NF de '+(o.paciente||'—')+' ('+BRL(+o.total||0)+') como emitida?')) return;
+  try{
+    await db.collection('painel_orcamentos').doc(id).update({nf_emitida:true});
+    o.nf_emitida = true;
+    nfRender();
+  }catch(e){
+    console.warn('Falha ao marcar NF:', e);
+    alert('Erro ao atualizar ('+(e.message||e)+'). Tente novamente.');
+  }
+}
+
+function nfRender(){
+  nfRebuildFiltros();
+  nfRenderResumo();
+  nfRenderLista();
+}
+
+var nfWired = false;
+function nfWire(){
+  if(nfWired) return; nfWired = true;
+  document.getElementById('nfMes').addEventListener('change', function(e){ nfFiltro.mes = e.target.value; nfRender(); });
+  document.getElementById('nfStatus').addEventListener('change', function(e){ nfFiltro.status = e.target.value; nfRender(); });
+  document.getElementById('nfColab').addEventListener('change', function(e){ nfFiltro.colab = e.target.value; nfRender(); });
+  document.getElementById('btnLimparNf').addEventListener('click', function(){
+    nfFiltro = {mes:'', status:'', colab:''};
+    document.getElementById('nfMes').value = '';
+    document.getElementById('nfStatus').value = '';
+    document.getElementById('nfColab').value = '';
+    nfRender();
+  });
+}
+
 var booted=false;
 async function boot(){
   if(booted)return; booted=true;
@@ -1894,6 +2075,7 @@ async function boot(){
   rebuildFilters(); renderHist(); renderAll();
   orcWire();
   desempWire();
+  nfWire();
   await Promise.all([carregarOrcamentos(), carregarMetas()]);
   desempRender();
   try{

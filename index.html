@@ -201,7 +201,7 @@ td{padding:13px 18px;vertical-align:middle}
 .orc-field{min-width:0}
 .orc-field label{display:block;font-size:12.5px;color:var(--ink);font-weight:500;margin-bottom:6px}
 .orc-field label .req{color:var(--coral)}
-.orc-field input[type=text],.orc-field input[type=number],.orc-field select,.orc-field textarea{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.orc-field input[type=text],.orc-field input[type=number],.orc-field input[type=date],.orc-field select,.orc-field textarea{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
 .orc-field input:focus,.orc-field select:focus,.orc-field textarea:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
 .orc-field textarea{resize:vertical;min-height:80px}
 .orc-dent-list{width:100%;padding:6px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;margin-top:8px;color:var(--ink)}
@@ -297,9 +297,10 @@ td{padding:13px 18px;vertical-align:middle}
       <button class="nav-item" data-view="colabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5M17 17a3 3 0 1 0 6 0 3 3 0 0 0-6 0zM7 7a3 3 0 1 0-6 0 3 3 0 0 0 6 0z"/></svg>Colaboradoras</button>
       <button class="nav-item" data-view="dentists"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5.5C10 3.5 6 3.5 6 8c0 4 1.5 5 2 9 .3 2.5 3 2.5 3 0 0-2 .5-3 1-3s1 1 1 3c0 2.5 2.7 2.5 3 0 .5-4 2-5 2-9 0-4.5-4-4.5-6-2.5z"/></svg>Dentistas</button>
       <div class="nav-label">Dados</div>
-      <button class="nav-item" data-view="novo-orcamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Novo Orçamento</button>
+      <button class="nav-item" data-view="producao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>Produção Diária</button>
+      <button class="nav-item" data-view="novo-orcamento" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Novo Orçamento</button>
       <button class="nav-item" data-view="desempenho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Desempenho</button>
-      <button class="nav-item" data-view="nf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>NF</button>
+      <button class="nav-item" data-view="nf" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>NF</button>
       <button class="nav-item" data-view="import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar dados</button>
       <button class="nav-item" data-view="pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pendências<span class="badge-n" id="pendCount">0</span></button>
     </nav>
@@ -548,6 +549,49 @@ td{padding:13px 18px;vertical-align:middle}
       </section>
 
       <!-- DESEMPENHO VIEW -->
+      <!-- PRODUÇÃO DIÁRIA VIEW -->
+      <section class="view" id="view-producao">
+        <div class="orc-card">
+          <div class="orc-section-h first">Lançamento de produção</div>
+          <div class="orc-grid-2">
+            <div class="orc-field">
+              <label>Data da produção <span class="req">*</span></label>
+              <input type="date" id="prodData">
+            </div>
+            <div class="orc-field">
+              <label>Colaboradora <span class="req">*</span></label>
+              <div id="prodColabFixo" style="display:none;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#f4f7f9;font-size:14px;color:var(--ink)"></div>
+              <select id="prodColabSel"></select>
+            </div>
+          </div>
+
+          <div class="orc-section-h">Valores do dia (R$)</div>
+          <div class="orc-grid-3">
+            <div class="orc-field"><label>Caixa do dia</label><input type="text" id="prodCaixa" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field"><label>Efetivação</label><input type="text" id="prodEfetivacao" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field"><label>Financiamento</label><input type="text" id="prodFinanc" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+          </div>
+
+          <div class="orc-section-h">Planos vendidos (quantidade)</div>
+          <div class="orc-grid-2">
+            <div class="orc-field"><label>Plano Life Essencial</label><input type="number" id="prodLife" min="0" step="1" placeholder="0" inputmode="numeric"></div>
+            <div class="orc-field"><label>Plano Life Orto</label><input type="number" id="prodOrto" min="0" step="1" placeholder="0" inputmode="numeric"></div>
+          </div>
+
+          <div class="orc-section-h">Atendimento</div>
+          <div class="orc-field" style="max-width:360px">
+            <label>Quantos pacientes comerciais atendidos</label>
+            <input type="number" id="prodPacientes" min="0" step="1" placeholder="0" inputmode="numeric">
+          </div>
+
+          <div class="orc-actions">
+            <button type="button" class="btn" id="btnSalvarProd">Salvar produção</button>
+            <button type="button" class="btn btn-ghost" id="btnLimparProd">Limpar</button>
+          </div>
+          <div class="imp-msg" id="prodMsg" style="margin-left:0"></div>
+        </div>
+      </section>
+
       <section class="view" id="view-desempenho">
         <div class="controls" style="margin-bottom:18px">
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">De</label>
@@ -567,19 +611,21 @@ td{padding:13px 18px;vertical-align:middle}
         <div class="tablecard">
           <table>
             <thead><tr>
-              <th>Paciente</th>
-              <th>Dentista</th>
-              <th class="num">Total</th>
-              <th>Status</th>
-              <th>Colaboradora</th>
               <th>Data</th>
+              <th>Colaboradora</th>
+              <th class="num">Caixa</th>
+              <th class="num">Efetivação</th>
+              <th class="num">Financiamento</th>
+              <th class="num">Life</th>
+              <th class="num">Orto</th>
+              <th class="num">Pacientes</th>
               <th>Ações</th>
             </tr></thead>
             <tbody id="tbDesemp"></tbody>
           </table>
           <div class="empty" id="desempEmpty" style="display:none">
-            <div class="big">Nenhum orçamento neste período</div>
-            <div>Ajuste os filtros ou cadastre um novo orçamento.</div>
+            <div class="big">Nenhum lançamento de produção neste período</div>
+            <div>Ajuste os filtros ou cadastre uma nova produção diária.</div>
           </div>
         </div>
 
@@ -712,8 +758,8 @@ function saveStore(){
 var BRL = function(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});};
 var initials = function(n){return n.split(' ').filter(function(w){return w.length>2;}).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();};
 var stLabel = {fechou:'Fechou', em_aberto:'Em aberto', sem_orcamento:'Sem orçamento'};
-var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas','novo-orcamento':'Novo Orçamento',desempenho:'Desempenho',nf:'NF',import:'Importar dados',pending:'Pendências'};
-var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas','novo-orcamento':'Dados / Novo Orçamento',desempenho:'Dados / Desempenho',nf:'Dados / NF',import:'Dados / Importar',pending:'Revisão / Pendências'};
+var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas',producao:'Produção Diária','novo-orcamento':'Novo Orçamento',desempenho:'Desempenho',nf:'NF',import:'Importar dados',pending:'Pendências'};
+var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas',producao:'Dados / Produção Diária','novo-orcamento':'Dados / Novo Orçamento',desempenho:'Dados / Desempenho',nf:'Dados / NF',import:'Dados / Importar',pending:'Revisão / Pendências'};
 function norm(s){ if(!s) return ""; return s.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
 function titlecase(s){ if(!s) return ""; var low=['de','da','do','das','dos','e']; return s.toString().trim().split(/\s+/).map(function(w){var l=w.toLowerCase(); return low.indexOf(l)>=0?l:(l.charAt(0).toUpperCase()+l.slice(1));}).join(' '); }
 
@@ -743,13 +789,14 @@ function ativarAba(v){
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('pageTitle').textContent=titleOf[v];
   document.getElementById('crumb').textContent=crumbOf[v];
-  var semPeriodo=(v==='import'||v==='novo-orcamento'||v==='desempenho'||v==='nf');
+  var semPeriodo=(v==='import'||v==='novo-orcamento'||v==='desempenho'||v==='nf'||v==='producao');
   document.getElementById('periodBar').style.display=semPeriodo?'none':'flex';
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
   try{ sessionStorage.setItem('amorsaude_ultima_aba', v); }catch(e){}
-  if(v==='desempenho'){ Promise.all([carregarOrcamentos(), carregarMetas()]).then(desempRender); }
+  if(v==='desempenho'){ Promise.all([carregarProducao(), carregarMetas()]).then(desempRender); }
   if(v==='nf'){ carregarOrcamentos().then(nfRender); }
+  if(v==='producao'){ carregarProducao().then(producaoRefreshHeader); }
   return true;
 }
 document.querySelectorAll('.nav-item').forEach(function(b){
@@ -1680,8 +1727,40 @@ function fmtDataBR(ymd){
   return m[3]+'/'+m[2]+'/'+m[1];
 }
 
+/* ==== PRODUÇÃO DIÁRIA (fonte de dados do Desempenho) ==== */
+var PRODUCAO = [];
+async function carregarProducao(){
+  try{
+    var snap = await db.collection('painel_producao').get();
+    PRODUCAO = [];
+    snap.forEach(function(doc){ var d=doc.data(); d._id=doc.id; PRODUCAO.push(d); });
+  }catch(e){
+    console.warn('Falha ao carregar produção:', e);
+  }
+}
+function producaoVisivel(){
+  if(!USUARIO_ATUAL) return [];
+  var p = USUARIO_ATUAL.perfil;
+  if(p==='gestora' || p==='coordenador') return PRODUCAO.slice();
+  if(p==='colaboradora'){
+    var email = (USUARIO_ATUAL.email||'').toLowerCase();
+    return PRODUCAO.filter(function(o){ return (o.colaboradora_email||'').toLowerCase() === email; });
+  }
+  return [];
+}
+function producaoFiltrada(){
+  return producaoVisivel().filter(function(o){
+    var d = o.data || '';
+    if(dFiltro.ini && d < dFiltro.ini) return false;
+    if(dFiltro.fim && d > dFiltro.fim) return false;
+    if(dFiltro.mes && o.mes !== dFiltro.mes) return false;
+    if(dFiltro.colab && o.colaboradora !== dFiltro.colab) return false;
+    return true;
+  });
+}
+
 function desempRebuildFiltros(){
-  var base = orcamentosVisiveis();
+  var base = producaoVisivel();
   var mesesMap={}, colabsMap={};
   base.forEach(function(o){ if(o.mes) mesesMap[o.mes]=true; if(o.colaboradora) colabsMap[o.colaboradora]=true; });
   var mesArr = Object.keys(mesesMap).sort().reverse();
@@ -1699,41 +1778,28 @@ function desempRebuildFiltros(){
 }
 
 function desempRenderKPIs(rows){
-  var caixa=0, financ=0, pagoTotal=0, somaTotal=0;
-  var lifeEss=0, lifeOrto=0, nPago=0;
+  var caixa=0, efet=0, financ=0, life=0, orto=0, pacientes=0;
   rows.forEach(function(o){
-    var formas = Array.isArray(o.formas_pagamento)?o.formas_pagamento:[];
-    formas.forEach(function(f){
-      var v = +f.valor || 0;
-      if(CAIXA_FORMAS.indexOf(f.forma)>=0) caixa += v;
-      if(f.forma==='Financiamento') financ += v;
-    });
-    var total = +o.total || 0;
-    somaTotal += total;
-    if(o.status==='pago'){ pagoTotal += total; nPago++; }
-    if(o.plano_odontologico){
-      if(o.life==='essencial') lifeEss++;
-      else if(o.life==='orto') lifeOrto++;
-    }
+    caixa += +o.caixa || 0;
+    efet += +o.efetivacao || 0;
+    financ += +o.financiamento || 0;
+    life += +o.life || 0;
+    orto += +o.orto || 0;
+    pacientes += +o.pacientes || 0;
   });
   var n = rows.length;
-  var conv = n>0 ? (nPago/n*100) : 0;
-  var ticketOrcado = n>0 ? somaTotal/n : 0;
-  var ticketEfet = nPago>0 ? pagoTotal/nPago : 0;
   var meta = metaAtual();
   function cardSimples(cls,lbl,val,sub){
     return '<div class="kpi '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>';
   }
   document.getElementById('desempKpis').innerHTML =
-    cardSimples('k-sky','Qtd de orçamentos',n,'') +
-    cardSimples('k-green','Qtd efetivados',nPago,conv.toFixed(1)+'% de conversão') +
-    cardMeta('k-green','Efetivação realizado', pagoTotal, +meta.efetivacao||0, true) +
     cardMeta('k-sky','Caixa realizado', caixa, +meta.caixa||0, true) +
+    cardMeta('k-green','Efetivação realizado', efet, +meta.efetivacao||0, true) +
     cardMeta('k-amber','Financiamento', financ, +meta.financiamento||0, true) +
-    cardSimples('k-sky','Ticket médio orçado',BRL(ticketOrcado),'') +
-    cardSimples('k-green','Ticket médio efetivado',BRL(ticketEfet),'') +
-    cardMeta('k-coral','Life Essencial', lifeEss, +meta.life_essencial||0, false) +
-    cardMeta('k-coral','Life Orto', lifeOrto, +meta.life_orto||0, false);
+    cardMeta('k-coral','Life Essencial', life, +meta.life_essencial||0, false) +
+    cardMeta('k-coral','Life Orto', orto, +meta.life_orto||0, false) +
+    cardSimples('k-sky','Pacientes atendidos', pacientes, '') +
+    cardSimples('k-sky','Lançamentos', n, n===1 ? '1 dia registrado' : n+' dias registrados');
 }
 
 function desempRenderLista(rows){
@@ -1742,107 +1808,155 @@ function desempRenderLista(rows){
   if(!rows.length){ tb.innerHTML=''; emp.style.display='block'; return; }
   emp.style.display='none';
   var sorted = rows.slice().sort(function(a,b){
-    var da=a.data_orcamento||'', dbb=b.data_orcamento||'';
+    var da=a.data||'', dbb=b.data||'';
     if(da===dbb){ return (b.criado_em||'').localeCompare(a.criado_em||''); }
     return da<dbb ? 1 : -1;
   });
+  var pAtual = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  var podeExcluir = (pAtual==='gestora' || pAtual==='coordenador');
   tb.innerHTML = sorted.map(function(o){
     var id = o._id || '';
-    var isOpen = !!dFiltro.open[id];
-    var stCls = DESEMP_STATUS_CLS[o.status] || 'sem_orcamento';
-    var stLbl = DESEMP_STATUS_LBL[o.status] || (o.status||'—');
-    var detail='';
-    if(isOpen){
-      var esp = o.especialidades || {};
-      var nameMap = {endodontia:'Endodontia',clinico_geral:'Clínico Geral',implantodontia:'Implantodontia',protese:'Prótese',ortodontia:'Ortodontia'};
-      var espRows = ['endodontia','clinico_geral','implantodontia','protese','ortodontia']
-        .filter(function(k){return (+esp[k]||0)>0;})
-        .map(function(k){
-          var dpa = o.dentistas_por_area && o.dentistas_por_area[k];
-          return '<tr><td>'+nameMap[k]+'</td><td class="num">'+BRL(+esp[k]||0)+'</td><td style="color:var(--muted)">'+(dpa||'principal')+'</td></tr>';
-        }).join('');
-      if(!espRows) espRows='<tr><td colspan="3" style="color:var(--muted)">Sem valores por especialidade.</td></tr>';
-      var formas = Array.isArray(o.formas_pagamento)?o.formas_pagamento:[];
-      var formasHtml = formas.map(function(f){
-        var parc = f.parcelas?(' · '+f.parcelas+'x'):'';
-        return '<div>'+(f.forma||'—')+': '+BRL(+f.valor||0)+parc+'</div>';
-      }).join('') || '<span style="color:var(--muted)">—</span>';
-      var plano = o.plano_odontologico ? ('Sim'+(o.life?(' ('+(o.life==='essencial'?'Life Essencial':'Life Orto')+')'):'')) : 'Não';
-      var nf = o.nf_emitida ? 'Sim' : 'Não';
-      var obs = (o.observacoes||'').trim() || '<span style="color:var(--muted)">—</span>';
-      var descLine='';
-      if(o.desconto){
-        var dt = o.desconto.tipo==='%' ? ((+o.desconto.valor||0)+'%') : BRL(+o.desconto.valor||0);
-        descLine = '<div><b>Desconto:</b> '+dt+' <span style="color:var(--muted)">(aplicado: '+BRL(+o.desconto.calculado||0)+')</span></div>';
-      }
-      detail = '<tr class="detail"><td colspan="7"><div class="detail-inner">'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px"><div>'
-          +'<table><thead><tr><th>Especialidade</th><th class="num">Valor</th><th>Dentista</th></tr></thead><tbody>'+espRows+'</tbody></table>'
-        +'</div><div style="padding:9px 12px;font-size:13px;line-height:1.65">'
-          +'<div><b>Subtotal:</b> '+BRL(+o.subtotal||0)+'</div>'
-          +descLine
-          +'<div><b>Total:</b> '+BRL(+o.total||0)+'</div>'
-          +'<div style="margin-top:8px"><b>Formas de pagamento:</b><div style="margin-left:8px">'+formasHtml+'</div></div>'
-          +'<div style="margin-top:8px"><b>Plano:</b> '+plano+' · <b>NF:</b> '+nf+'</div>'
-          +'<div style="margin-top:8px"><b>Obs:</b> '+obs+'</div>'
-        +'</div></div></div></td></tr>';
-    }
-    var pAtual = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
-    var podeExcluir = (pAtual==='gestora' || pAtual==='coordenador');
     var actCell = podeExcluir
-      ? '<td><button class="hdel orc-del" data-id="'+id+'">Excluir</button></td>'
+      ? '<td><button class="hdel prod-del" data-id="'+id+'">Excluir</button></td>'
       : '<td></td>';
-    return '<tr class="clickable '+(isOpen?'open':'')+'" data-id="'+id+'">'
-      +'<td class="pac">'+(o.paciente||'—')+'</td>'
-      +'<td class="dent">'+(o.dentista||'—')+'</td>'
-      +'<td class="num big">'+BRL(+o.total||0)+'</td>'
-      +'<td><span class="badge '+stCls+'">'+stLbl+'</span></td>'
+    return '<tr>'
+      +'<td>'+fmtDataBR(o.data)+'</td>'
       +'<td>'+(o.colaboradora||'—')+'</td>'
-      +'<td>'+fmtDataBR(o.data_orcamento)+'</td>'
+      +'<td class="num">'+BRL(+o.caixa||0)+'</td>'
+      +'<td class="num">'+BRL(+o.efetivacao||0)+'</td>'
+      +'<td class="num">'+BRL(+o.financiamento||0)+'</td>'
+      +'<td class="num">'+(+o.life||0)+'</td>'
+      +'<td class="num">'+(+o.orto||0)+'</td>'
+      +'<td class="num">'+(+o.pacientes||0)+'</td>'
       +actCell
-      +'</tr>'+detail;
+      +'</tr>';
   }).join('');
-  tb.querySelectorAll('tr[data-id]').forEach(function(tr){
-    tr.onclick = function(){
-      var id = tr.dataset.id;
-      dFiltro.open[id] = !dFiltro.open[id];
-      desempRenderLista(rows);
-    };
-  });
-  tb.querySelectorAll('button.orc-del').forEach(function(btn){
+  tb.querySelectorAll('button.prod-del').forEach(function(btn){
     btn.onclick = function(e){
       e.stopPropagation();
-      excluirOrcamento(btn.dataset.id);
+      excluirProducao(btn.dataset.id);
     };
   });
 }
 
-async function excluirOrcamento(id){
+async function excluirProducao(id){
   if(!USUARIO_ATUAL) return;
   var p = USUARIO_ATUAL.perfil;
   if(p !== 'gestora' && p !== 'coordenador') return;
-  var o = ORCAMENTOS.find(function(x){return x._id === id;});
+  var o = PRODUCAO.find(function(x){return x._id === id;});
   if(!o) return;
-  var nome = o.paciente || '—';
-  var total = BRL(+o.total||0);
+  var dataStr = fmtDataBR(o.data);
   var colab = o.colaboradora || '—';
-  if(!confirm('Excluir o orçamento de '+nome+' ('+total+') lançado por '+colab+'? Esta ação é permanente e não pode ser desfeita.')) return;
+  if(!confirm('Excluir o lançamento de produção de '+colab+' do dia '+dataStr+'? Esta ação é permanente e não pode ser desfeita.')) return;
   try{
-    await db.collection('painel_orcamentos').doc(id).delete();
-    ORCAMENTOS = ORCAMENTOS.filter(function(x){return x._id !== id;});
-    if(dFiltro.open) delete dFiltro.open[id];
+    await db.collection('painel_producao').doc(id).delete();
+    PRODUCAO = PRODUCAO.filter(function(x){return x._id !== id;});
     desempRender();
   }catch(e){
-    console.warn('Falha ao excluir orçamento:', e);
+    console.warn('Falha ao excluir produção:', e);
     alert('Erro ao excluir ('+(e.message||e)+'). Tente novamente.');
   }
 }
 
 function desempRender(){
   desempRebuildFiltros();
-  var rows = orcamentosFiltrados();
+  var rows = producaoFiltrada();
   desempRenderKPIs(rows);
   desempRenderLista(rows);
+}
+
+/* ==== FORMULÁRIO DE PRODUÇÃO DIÁRIA ==== */
+function producaoHojeISO(){
+  var d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function producaoColabsList(){
+  var lst = [];
+  Object.keys(USUARIOS).forEach(function(em){
+    if(USUARIOS[em].perfil === 'colaboradora') lst.push({email:em, nome:USUARIOS[em].nome});
+  });
+  return lst;
+}
+function producaoRefreshHeader(){
+  // Ajusta campo Colaboradora conforme perfil + data default
+  var dataInp = document.getElementById('prodData');
+  if(dataInp && !dataInp.value) dataInp.value = producaoHojeISO();
+  var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  var fixo = document.getElementById('prodColabFixo');
+  var sel = document.getElementById('prodColabSel');
+  if(!fixo || !sel) return;
+  if(p === 'colaboradora'){
+    fixo.textContent = USUARIO_ATUAL.nome;
+    fixo.style.display = '';
+    sel.style.display = 'none';
+  } else {
+    fixo.style.display = 'none';
+    sel.style.display = '';
+    var lst = producaoColabsList();
+    sel.innerHTML = '<option value="">— escolha a colaboradora —</option>'
+      + lst.map(function(c){ return '<option value="'+c.email+'">'+c.nome+'</option>'; }).join('');
+  }
+}
+function limparProducao(){
+  ['prodCaixa','prodEfetivacao','prodFinanc','prodLife','prodOrto','prodPacientes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('prodData').value = producaoHojeISO();
+  var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  if(p !== 'colaboradora') document.getElementById('prodColabSel').value = '';
+  document.getElementById('prodMsg').className = 'imp-msg';
+}
+async function salvarProducao(){
+  var msg = document.getElementById('prodMsg');
+  function show(t,cls){ msg.className='imp-msg show '+cls; msg.textContent=t; }
+  var data = document.getElementById('prodData').value;
+  if(!data){ show('Informe a data da produção.','err'); return; }
+  var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  var colabNome, colabEmail;
+  if(p === 'colaboradora'){
+    colabNome = USUARIO_ATUAL.nome;
+    colabEmail = USUARIO_ATUAL.email;
+  } else {
+    colabEmail = document.getElementById('prodColabSel').value;
+    if(!colabEmail){ show('Selecione a colaboradora.','err'); return; }
+    var u = USUARIOS[colabEmail];
+    if(!u){ show('Colaboradora inválida.','err'); return; }
+    colabNome = u.nome;
+  }
+  var mes = (data.match(/^(\d{4})-(\d{2})/)||[])[0] || '';
+  var registro = {
+    data: data,
+    mes: mes,
+    colaboradora: colabNome,
+    colaboradora_email: colabEmail,
+    caixa: brToNum(document.getElementById('prodCaixa').value),
+    efetivacao: brToNum(document.getElementById('prodEfetivacao').value),
+    financiamento: brToNum(document.getElementById('prodFinanc').value),
+    life: Math.max(0, parseInt(document.getElementById('prodLife').value,10)||0),
+    orto: Math.max(0, parseInt(document.getElementById('prodOrto').value,10)||0),
+    pacientes: Math.max(0, parseInt(document.getElementById('prodPacientes').value,10)||0),
+    origem: 'manual',
+    criado_em: new Date().toISOString()
+  };
+  var btn = document.getElementById('btnSalvarProd'); btn.disabled=true;
+  try{
+    var id = 'prod_'+Date.now();
+    await db.collection('painel_producao').doc(id).set(registro);
+    registro._id = id;
+    PRODUCAO.push(registro);
+    show('Produção salva com sucesso!','ok');
+    limparProducao();
+  }catch(e){
+    console.warn('Falha ao salvar produção:', e);
+    show('Erro ao salvar na nuvem ('+(e.message||e)+'). Os dados continuam no formulário.','err');
+  }finally{
+    btn.disabled=false;
+  }
+}
+var producaoWired = false;
+function producaoWire(){
+  if(producaoWired) return; producaoWired = true;
+  producaoRefreshHeader();
+  document.getElementById('btnSalvarProd').addEventListener('click', salvarProducao);
+  document.getElementById('btnLimparProd').addEventListener('click', limparProducao);
 }
 
 /* ==== MODAL DE METAS ==== */
@@ -2076,7 +2190,8 @@ async function boot(){
   orcWire();
   desempWire();
   nfWire();
-  await Promise.all([carregarOrcamentos(), carregarMetas()]);
+  producaoWire();
+  await Promise.all([carregarOrcamentos(), carregarMetas(), carregarProducao()]);
   desempRender();
   try{
     var ultima = sessionStorage.getItem('amorsaude_ultima_aba');

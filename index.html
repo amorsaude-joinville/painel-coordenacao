@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 
 :root{--sky:#62bdd4;--sky-dark:#3f9fb8;--sky-deep:#2b7d94;--sky-soft:#e6f4f8;--coral:#d94436;--coral-soft:#fbe4e1;--ink:#1f2a2e;--muted:#6e8088;--line:#e3e9ec;--bg:#f4f7f9;--card:#fff;--amber:#c07a1e;--amber-soft:#f8eed9;--green:#2f8f6b;--green-soft:#e1f1ea}
@@ -19,7 +19,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webki
 .lock-card{background:#fff;border-radius:20px;padding:42px 38px 34px;width:min(92vw,380px);box-shadow:0 24px 60px rgba(0,0,0,.25);text-align:center}
 .lock-logo{width:64px;height:64px;border-radius:16px;background:#eaf6f9;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
 .lock-logo svg{width:40px;height:40px}
-.lock-card h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-bottom:5px}
+.lock-card h2{font-family:'Inter',sans-serif;font-weight:600;font-size:22px;margin-bottom:5px}
 .lock-card p{font-size:13px;color:var(--muted);margin-bottom:24px}
 .lock-field{margin-bottom:14px}
 .lock-field input{width:100%;padding:13px 16px;border:1px solid #dfe6e9;border-radius:11px;font-size:15px;font-family:inherit;text-align:center}
@@ -37,19 +37,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webki
 .brand .name{font-weight:700;font-size:15px;line-height:1.1}
 .brand .unit{font-size:11px;opacity:.85}
 nav{padding:14px 12px;flex:1;overflow-y:auto}
-.nav-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;padding:10px 12px 6px}
+.nav-label{font-family:'Inter',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;padding:10px 12px 6px}
 .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:rgba(255,255,255,.92);transition:.14s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
 .nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.9}
 .nav-item:hover{background:rgba(255,255,255,.14)}
 .nav-item.on{background:#fff;color:var(--sky-deep);font-weight:600}
-.nav-item .badge-n{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--coral);color:#fff;padding:1px 7px;border-radius:999px}
+.nav-item .badge-n{margin-left:auto;font-family:'Inter',sans-serif;font-size:10px;background:var(--coral);color:#fff;padding:1px 7px;border-radius:999px}
 .side-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.18);font-size:11px;opacity:.85}
 .side-foot .who{display:flex;align-items:center;gap:9px;margin-bottom:4px}
 .side-foot .dot{width:7px;height:7px;border-radius:50%;background:#fff}
 .main{display:flex;flex-direction:column;min-width:0}
 .topbar{background:var(--card);border-bottom:1px solid var(--line);padding:16px 30px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
 .topbar h1{font-size:19px;font-weight:600}
-.topbar .crumb{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.topbar .crumb{font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .topbar .date{font-size:12.5px;color:var(--muted)}
 .content{padding:28px 30px 60px;flex:1}
 .view{display:none}.view.active{display:block;animation:fade .25s ease}
@@ -85,7 +85,7 @@ nav{padding:14px 12px;flex:1;overflow-y:auto}
 .rank .av{width:34px;height:34px;border-radius:50%;background:var(--sky);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rank .nm{font-weight:500;font-size:14px;flex:1;min-width:0}
 .rank .nm small{display:block;color:var(--muted);font-weight:400;font-size:11.5px}
-.rank .mt{text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600}
+.rank .mt{text-align:right;font-family:'Inter',sans-serif;font-size:13px;font-weight:600}
 .rank .mt small{display:block;color:var(--muted);font-size:10px;font-weight:500}
 .controls{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-bottom:18px}
 .search{flex:1;min-width:220px;position:relative}
@@ -95,13 +95,13 @@ nav{padding:14px 12px;flex:1;overflow-y:auto}
 select{padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-family:inherit;font-size:14px;cursor:pointer}
 select:focus{outline:2px solid var(--sky);outline-offset:-1px}
 .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.pill{font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);transition:.14s}
+.pill{font-family:'Inter',sans-serif;font-size:11px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);transition:.14s}
 .pill:hover{border-color:var(--sky);color:var(--sky-deep)}
 .pill.on{background:var(--sky);color:#fff;border-color:var(--sky)}
 .pill .ct{opacity:.65;margin-left:5px}
 .tablecard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 table{width:100%;border-collapse:collapse;font-size:14px}
-thead th{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);background:#fafcfd;cursor:pointer;user-select:none;white-space:nowrap}
+thead th{font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);background:#fafcfd;cursor:pointer;user-select:none;white-space:nowrap}
 thead th.num{text-align:right}
 tbody tr{border-bottom:1px solid var(--line);transition:background .12s}
 tbody tr.clickable{cursor:pointer}
@@ -110,14 +110,14 @@ tbody tr.clickable:hover{background:var(--sky-soft)}
 tbody tr.open{background:var(--sky-soft)}
 td{padding:13px 18px;vertical-align:middle}
 .pac{font-weight:600}
-.pac .nocad{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--amber);letter-spacing:.04em;display:block;margin-top:2px;font-weight:500}
+.pac .nocad{font-family:'Inter',sans-serif;font-size:9px;color:var(--amber);letter-spacing:.04em;display:block;margin-top:2px;font-weight:500}
 .colab{display:inline-flex;align-items:center;gap:8px}
 .av-sm{width:24px;height:24px;border-radius:50%;background:var(--sky);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .colab.none{color:var(--amber);font-style:italic;font-size:13px}
-.num{font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;white-space:nowrap}
+.num{font-family:'Inter',sans-serif;font-size:13px;text-align:right;white-space:nowrap}
 .num.big{font-weight:600}
 .dent{font-size:12.5px;color:var(--muted);max-width:230px}
-.badge{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap;font-weight:600}
+.badge{font-family:'Inter',sans-serif;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap;font-weight:600}
 .badge.fechou{background:var(--green-soft);color:var(--green)}
 .badge.em_aberto{background:var(--amber-soft);color:var(--amber)}
 .badge.sem_orcamento{background:#eef1f3;color:var(--muted)}
@@ -129,13 +129,13 @@ td{padding:13px 18px;vertical-align:middle}
 .detail-inner tr:last-child td{border-bottom:none}
 .dot2{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px}
 .dot2.y{background:var(--green)}.dot2.n{background:var(--amber)}
-.flag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--coral);background:var(--coral-soft);padding:2px 8px;border-radius:5px}
+.flag{font-family:'Inter',sans-serif;font-size:10px;color:var(--coral);background:var(--coral-soft);padding:2px 8px;border-radius:5px}
 .empty{padding:64px;text-align:center;color:var(--muted)}
 .empty .big{font-size:17px;color:var(--ink);font-weight:600;margin-bottom:6px}
 .pend-card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:12px;padding:18px 22px;margin-bottom:16px}
 .pend-card.coral{border-left-color:var(--coral)}
 .pend-card h3{font-size:14.5px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:9px}
-.pend-card h3 .tag{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--amber-soft);color:var(--amber);padding:2px 9px;border-radius:999px}
+.pend-card h3 .tag{font-family:'Inter',sans-serif;font-size:10px;background:var(--amber-soft);color:var(--amber);padding:2px 9px;border-radius:999px}
 .pend-card.coral h3 .tag{background:var(--coral-soft);color:var(--coral)}
 .pend-card p{font-size:13px;color:var(--muted);margin-bottom:12px}
 .pend-list{display:flex;flex-wrap:wrap;gap:8px}
@@ -192,7 +192,7 @@ td{padding:13px 18px;vertical-align:middle}
 .menu-btn svg{width:20px;height:20px}
 /* NOVO ORÇAMENTO */
 .orc-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;max-width:980px}
-.orc-section-h{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 12px;border-top:1px solid var(--line);padding-top:18px;font-weight:600}
+.orc-section-h{font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 12px;border-top:1px solid var(--line);padding-top:18px;font-weight:600}
 .orc-section-h.first{margin-top:0;border-top:none;padding-top:0}
 .orc-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
 .orc-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:14px}
@@ -212,9 +212,26 @@ td{padding:13px 18px;vertical-align:middle}
 .orc-radio input{margin:0;cursor:pointer;accent-color:var(--sky)}
 .orc-desconto{display:grid;grid-template-columns:1fr 90px;gap:8px}
 .orc-total-box{background:var(--green-soft);border:1px solid #b8dfd1;border-radius:12px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;margin:18px 0;flex-wrap:wrap;gap:10px}
-.orc-total-box .lbl{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:600}
-.orc-total-box .val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--green);letter-spacing:-.02em}
+.orc-total-box .lbl{font-family:'Inter',sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:600}
+.orc-total-box .val{font-family:'Inter',sans-serif;font-size:26px;font-weight:700;color:var(--green);letter-spacing:-.02em}
 .orc-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.orc-other-dent{background:none;border:none;color:var(--sky);font-size:12px;font-family:inherit;cursor:pointer;padding:6px 0 0 2px;text-decoration:underline;display:inline-block}
+.orc-other-dent:hover{color:var(--sky-deep)}
+.orc-area-dent-box{margin-top:8px}
+.orc-area-dent{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink)}
+.orc-area-dent:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
+.orc-pagamento{margin-bottom:10px}
+.orc-pagamento + .orc-pagamento{padding-top:10px;border-top:1px dashed var(--line)}
+.orc-pag-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.orc-pag-row select,.orc-pag-row input[type=text],.orc-pag-row input[type=number]{padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.orc-pag-row select:focus,.orc-pag-row input:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
+.orc-pag-row .orc-pag-forma{flex:1.4 1 220px;min-width:0}
+.orc-pag-row .orc-pag-valor{flex:1 1 140px;min-width:0}
+.orc-pag-row .orc-pag-parc{flex:0 0 110px;min-width:0}
+.orc-pag-remove{background:none;border:1px solid var(--line);border-radius:8px;color:var(--coral);font-size:12px;padding:8px 12px;cursor:pointer;font-family:inherit}
+.orc-pag-remove:hover{background:var(--coral-soft);border-color:var(--coral)}
+.orc-add-pag{background:none;border:1px dashed var(--line);border-radius:10px;color:var(--sky-deep);font-size:13px;padding:10px 14px;cursor:pointer;margin-top:10px;font-family:inherit;display:inline-block}
+.orc-add-pag:hover{border-color:var(--sky);background:var(--sky-soft)}
 
 </style>
 </head>
@@ -263,10 +280,10 @@ td{padding:13px 18px;vertical-align:middle}
 
       <!-- período filter (intervalo de datas do orçamento, shared, shown on data views) -->
       <div class="controls" id="periodBar" style="margin-bottom:22px">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Período:</div>
-        <label for="fDataIni" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">De</label>
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Período:</div>
+        <label for="fDataIni" style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">De</label>
         <input type="date" id="fDataIni" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff">
-        <label for="fDataFim" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Até</label>
+        <label for="fDataFim" style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Até</label>
         <input type="date" id="fDataFim" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff">
         <button id="btnLimparData" class="btn btn-ghost" style="font-size:13px;padding:8px 14px">Limpar datas</button>
       </div>
@@ -400,13 +417,38 @@ td{padding:13px 18px;vertical-align:middle}
 
           <div class="orc-section-h">Valores por especialidade (R$)</div>
           <div class="orc-grid-3">
-            <div class="orc-field"><label>Endodontia</label><input type="text" id="orcVlrEndo" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
-            <div class="orc-field"><label>Clínico Geral</label><input type="text" id="orcVlrClinico" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
-            <div class="orc-field"><label>Implantodontia</label><input type="text" id="orcVlrImplante" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field">
+              <label>Endodontia</label>
+              <input type="text" id="orcVlrEndo" placeholder="0,00" inputmode="decimal" autocomplete="off">
+              <button type="button" class="orc-other-dent">outro dentista</button>
+              <div class="orc-area-dent-box" id="orcAreaEndoBox" style="display:none"><select id="orcAreaEndo" class="orc-area-dent"></select></div>
+            </div>
+            <div class="orc-field">
+              <label>Clínico Geral</label>
+              <input type="text" id="orcVlrClinico" placeholder="0,00" inputmode="decimal" autocomplete="off">
+              <button type="button" class="orc-other-dent">outro dentista</button>
+              <div class="orc-area-dent-box" id="orcAreaClinicoBox" style="display:none"><select id="orcAreaClinico" class="orc-area-dent"></select></div>
+            </div>
+            <div class="orc-field">
+              <label>Implantodontia</label>
+              <input type="text" id="orcVlrImplante" placeholder="0,00" inputmode="decimal" autocomplete="off">
+              <button type="button" class="orc-other-dent">outro dentista</button>
+              <div class="orc-area-dent-box" id="orcAreaImplBox" style="display:none"><select id="orcAreaImpl" class="orc-area-dent"></select></div>
+            </div>
           </div>
           <div class="orc-grid-2">
-            <div class="orc-field"><label>Prótese</label><input type="text" id="orcVlrProtese" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
-            <div class="orc-field"><label>Ortodontia</label><input type="text" id="orcVlrOrto" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field">
+              <label>Prótese</label>
+              <input type="text" id="orcVlrProtese" placeholder="0,00" inputmode="decimal" autocomplete="off">
+              <button type="button" class="orc-other-dent">outro dentista</button>
+              <div class="orc-area-dent-box" id="orcAreaProtBox" style="display:none"><select id="orcAreaProt" class="orc-area-dent"></select></div>
+            </div>
+            <div class="orc-field">
+              <label>Ortodontia</label>
+              <input type="text" id="orcVlrOrto" placeholder="0,00" inputmode="decimal" autocomplete="off">
+              <button type="button" class="orc-other-dent">outro dentista</button>
+              <div class="orc-area-dent-box" id="orcAreaOrtoBox" style="display:none"><select id="orcAreaOrto" class="orc-area-dent"></select></div>
+            </div>
           </div>
 
           <div class="orc-section-h">Plano e nota fiscal</div>
@@ -443,17 +485,10 @@ td{padding:13px 18px;vertical-align:middle}
               <label class="orc-radio"><input type="radio" name="orcStatus" value="acompanhar"> Acompanhar</label>
             </div>
           </div>
-          <div class="orc-field" style="max-width:360px">
-            <label>Forma de pagamento</label>
-            <select id="orcFormaPag">
-              <option>Dinheiro</option>
-              <option>PIX</option>
-              <option>Débito</option>
-              <option>Crédito à vista</option>
-              <option>Crédito parcelado</option>
-              <option>Financiamento</option>
-              <option>Boleto</option>
-            </select>
+          <div class="orc-field" style="max-width:680px">
+            <label>Forma(s) de pagamento</label>
+            <div id="orcPagamentos"></div>
+            <button type="button" id="btnAddPag" class="orc-add-pag">+ Adicionar 2ª forma de pagamento</button>
           </div>
 
           <div class="orc-section-h">Observações</div>
@@ -1126,17 +1161,92 @@ function orcRecalcTotal(){
   var total=Math.max(0,soma-desconto);
   document.getElementById('orcTotal').textContent='R$ '+numToBR(total);
 }
+var ORC_AREAS = [
+  {key:'endodontia',     boxId:'orcAreaEndoBox',    selId:'orcAreaEndo'},
+  {key:'clinico_geral',  boxId:'orcAreaClinicoBox', selId:'orcAreaClinico'},
+  {key:'implantodontia', boxId:'orcAreaImplBox',    selId:'orcAreaImpl'},
+  {key:'protese',        boxId:'orcAreaProtBox',    selId:'orcAreaProt'},
+  {key:'ortodontia',     boxId:'orcAreaOrtoBox',    selId:'orcAreaOrto'}
+];
+function orcRenderAreaDentSelects(){
+  var html='<option value="">— usar dentista principal —</option>'+ORC_DENTISTAS.map(function(d){return '<option>'+d+'</option>';}).join('');
+  ORC_AREAS.forEach(function(a){
+    var sel=document.getElementById(a.selId);
+    if(sel) sel.innerHTML=html;
+  });
+}
+function orcResetAreaDents(){
+  ORC_AREAS.forEach(function(a){
+    var box=document.getElementById(a.boxId);
+    if(box) box.style.display='none';
+    var sel=document.getElementById(a.selId);
+    if(sel) sel.value='';
+  });
+  document.querySelectorAll('.orc-other-dent').forEach(function(btn){ btn.style.display='inline-block'; });
+}
+function orcCollectDentistasPorArea(){
+  var out={};
+  ORC_AREAS.forEach(function(a){
+    var box=document.getElementById(a.boxId);
+    var sel=document.getElementById(a.selId);
+    out[a.key]=(box && box.style.display!=='none' && sel && sel.value) ? sel.value : null;
+  });
+  return out;
+}
+
+var PAG_FORMAS=['Dinheiro','PIX','Débito','Crédito à vista','Crédito parcelado','Financiamento','Boleto'];
+function orcPagRowHTML(idx){
+  var opts=PAG_FORMAS.map(function(f){return '<option>'+f+'</option>';}).join('');
+  var sel='<select class="orc-pag-forma">'+opts+'</select>';
+  var val='<input type="text" class="orc-pag-valor" placeholder="Valor (R$)" inputmode="decimal" autocomplete="off">';
+  var parc='<input type="number" class="orc-pag-parc" min="2" max="24" placeholder="parcelas" style="display:none">';
+  var rem=idx>0 ? '<button type="button" class="orc-pag-remove">Remover</button>' : '';
+  return '<div class="orc-pagamento" data-idx="'+idx+'"><div class="orc-pag-row">'+sel+val+parc+rem+'</div></div>';
+}
+function orcBindPagRow(row){
+  var formaSel=row.querySelector('.orc-pag-forma');
+  var parc=row.querySelector('.orc-pag-parc');
+  formaSel.addEventListener('change',function(){
+    if(formaSel.value==='Crédito parcelado'){ parc.style.display=''; }
+    else { parc.style.display='none'; parc.value=''; }
+  });
+  var rem=row.querySelector('.orc-pag-remove');
+  if(rem){
+    rem.addEventListener('click',function(){
+      row.remove();
+      document.getElementById('btnAddPag').style.display='';
+    });
+  }
+}
+function orcAddPag(){
+  var cont=document.getElementById('orcPagamentos');
+  if(cont.querySelectorAll('.orc-pagamento').length>=2) return;
+  var idx=cont.querySelectorAll('.orc-pagamento').length;
+  cont.insertAdjacentHTML('beforeend', orcPagRowHTML(idx));
+  orcBindPagRow(cont.lastElementChild);
+  if(cont.querySelectorAll('.orc-pagamento').length>=2){
+    document.getElementById('btnAddPag').style.display='none';
+  }
+}
+function orcResetPag(){
+  var cont=document.getElementById('orcPagamentos');
+  cont.innerHTML=orcPagRowHTML(0);
+  orcBindPagRow(cont.firstElementChild);
+  document.getElementById('btnAddPag').style.display='';
+}
+
 function limparOrcamento(){
   ['orcPaciente','orcCPF','orcDentBusca','orcVlrEndo','orcVlrClinico','orcVlrImplante','orcVlrProtese','orcVlrOrto','orcDescontoVal','orcObs'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('orcPlano').checked=false;
   document.getElementById('orcNF').checked=false;
   document.getElementById('orcDescontoTipo').value='R$';
-  document.getElementById('orcFormaPag').value='Dinheiro';
   document.querySelectorAll('input[name=orcLife]').forEach(function(r){r.checked=false;});
   var pago=document.querySelector('input[name=orcStatus][value=pago]'); if(pago) pago.checked=true;
   document.getElementById('orcLifeBox').style.display='none';
   orcRenderDentList('');
   document.getElementById('orcDentLista').selectedIndex=-1;
+  orcResetAreaDents();
+  orcResetPag();
   document.getElementById('orcMsg').className='imp-msg';
   document.getElementById('orcTotal').textContent='R$ 0,00';
 }
@@ -1159,25 +1269,54 @@ async function salvarOrcamento(){
   var descTipo=document.getElementById('orcDescontoTipo').value;
   var desconto=descTipo==='%'?soma*(descV/100):descV;
   var total=Math.max(0,soma-desconto);
+  var totalRound=Math.round(total*100)/100;
+
+  var pagRows=document.querySelectorAll('#orcPagamentos .orc-pagamento');
+  var formas=[];
+  for(var i=0;i<pagRows.length;i++){
+    var row=pagRows[i];
+    var forma=row.querySelector('.orc-pag-forma').value;
+    var valTxt=row.querySelector('.orc-pag-valor').value.trim();
+    var valNum=valTxt?brToNum(valTxt):null;
+    var parcRaw=row.querySelector('.orc-pag-parc').value;
+    var parcelas=null;
+    if(forma==='Crédito parcelado'){
+      if(!parcRaw){ show('Informe o número de parcelas na forma "Crédito parcelado".','err'); return; }
+      parcelas=Math.max(2,Math.min(24,parseInt(parcRaw,10)));
+    }
+    formas.push({forma:forma, valor:valNum===null?null:Math.round(valNum*100)/100, parcelas:parcelas});
+  }
+  if(formas.length===2){
+    if(formas[0].valor===null || formas[1].valor===null){
+      show('Com 2 formas de pagamento, preencha o valor de cada uma.','err'); return;
+    }
+    var somaPag=formas[0].valor+formas[1].valor;
+    if(Math.abs(somaPag-totalRound)>0.01){
+      show('A soma das formas de pagamento (R$ '+numToBR(somaPag)+') não bate com o total (R$ '+numToBR(totalRound)+').','err'); return;
+    }
+  } else {
+    if(formas[0].valor===null) formas[0].valor=totalRound;
+  }
+
   var plano=document.getElementById('orcPlano').checked;
   var life=null;
   if(plano){var lr=document.querySelector('input[name=orcLife]:checked'); if(lr) life=lr.value;}
   var nf=document.getElementById('orcNF').checked;
   var sr=document.querySelector('input[name=orcStatus]:checked');
   var status=sr?sr.value:'pago';
-  var formaPag=document.getElementById('orcFormaPag').value;
   var obs=document.getElementById('orcObs').value.trim();
+  var dentPorArea=orcCollectDentistasPorArea();
   var hoje=new Date();
   var ymd=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
   var ym=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
   var registro={
-    paciente:paciente, cpf:cpf, dentista:dent,
+    paciente:paciente, cpf:cpf, dentista:dent, dentistas_por_area:dentPorArea,
     especialidades:{endodontia:vEndo, clinico_geral:vClin, implantodontia:vImpl, protese:vProt, ortodontia:vOrto},
     subtotal:Math.round(soma*100)/100,
     desconto:{valor:descV, tipo:descTipo, calculado:Math.round(desconto*100)/100},
-    total:Math.round(total*100)/100,
+    total:totalRound,
     plano_odontologico:plano, life:life, nf_emitida:nf,
-    status:status, forma_pagamento:formaPag, observacoes:obs,
+    status:status, formas_pagamento:formas, observacoes:obs,
     colaboradora:'Não identificada',
     data_orcamento:ymd, criado_em:hoje.toISOString(), mes:ym
   };
@@ -1194,6 +1333,8 @@ var orcWired=false;
 function orcWire(){
   if(orcWired) return; orcWired=true;
   orcRenderDentList('');
+  orcRenderAreaDentSelects();
+  orcResetPag();
   document.getElementById('orcDentBusca').addEventListener('input',function(e){orcRenderDentList(e.target.value);});
   document.getElementById('orcCPF').addEventListener('input',function(e){
     var v=e.target.value.replace(/\D/g,'').slice(0,11);
@@ -1212,6 +1353,16 @@ function orcWire(){
     if(e.target.checked){ box.style.display='flex'; }
     else { box.style.display='none'; box.querySelectorAll('input[type=radio]').forEach(function(r){r.checked=false;}); }
   });
+  document.querySelectorAll('.orc-other-dent').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var box=btn.nextElementSibling;
+      if(box && box.classList.contains('orc-area-dent-box')){
+        box.style.display='';
+        btn.style.display='none';
+      }
+    });
+  });
+  document.getElementById('btnAddPag').addEventListener('click',orcAddPag);
   document.getElementById('btnSalvarOrc').addEventListener('click',salvarOrcamento);
   document.getElementById('btnLimparOrc').addEventListener('click',limparOrcamento);
   orcRecalcTotal();

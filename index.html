@@ -1194,7 +1194,7 @@ function orcCollectDentistasPorArea(){
   return out;
 }
 
-var PAG_FORMAS=['Dinheiro','PIX','Débito','Crédito à vista','Crédito parcelado','Financiamento','Boleto'];
+var PAG_FORMAS=['Dinheiro','PIX','Débito','Crédito à vista','Crédito parcelado','Financiamento'];
 function orcPagRowHTML(idx){
   var opts=PAG_FORMAS.map(function(f){return '<option>'+f+'</option>';}).join('');
   var sel='<select class="orc-pag-forma">'+opts+'</select>';

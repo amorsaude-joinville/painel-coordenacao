@@ -264,6 +264,7 @@ td{padding:13px 18px;vertical-align:middle}
       <button class="nav-item" data-view="dentists"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5.5C10 3.5 6 3.5 6 8c0 4 1.5 5 2 9 .3 2.5 3 2.5 3 0 0-2 .5-3 1-3s1 1 1 3c0 2.5 2.7 2.5 3 0 .5-4 2-5 2-9 0-4.5-4-4.5-6-2.5z"/></svg>Dentistas</button>
       <div class="nav-label">Dados</div>
       <button class="nav-item" data-view="novo-orcamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Novo Orçamento</button>
+      <button class="nav-item" data-view="desempenho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Desempenho</button>
       <button class="nav-item" data-view="import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar dados</button>
       <button class="nav-item" data-view="pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pendências<span class="badge-n" id="pendCount">0</span></button>
     </nav>
@@ -511,6 +512,41 @@ td{padding:13px 18px;vertical-align:middle}
         </div>
       </section>
 
+      <!-- DESEMPENHO VIEW -->
+      <section class="view" id="view-desempenho">
+        <div class="controls" style="margin-bottom:18px">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">De</label>
+          <input type="date" id="dDataIni" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Até</label>
+          <input type="date" id="dDataFim" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Mês</label>
+          <select id="dMes" style="font-size:13px;padding:9px 12px"></select>
+          <span id="dColabWrap" style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Colab.</label>
+            <select id="dColab" style="font-size:13px;padding:9px 12px"></select>
+          </span>
+          <button id="btnLimparDesemp" class="btn btn-ghost" style="font-size:13px;padding:8px 14px">Limpar filtros</button>
+        </div>
+        <div class="kpis" id="desempKpis"></div>
+        <div class="tablecard">
+          <table>
+            <thead><tr>
+              <th>Paciente</th>
+              <th>Dentista</th>
+              <th class="num">Total</th>
+              <th>Status</th>
+              <th>Colaboradora</th>
+              <th>Data</th>
+            </tr></thead>
+            <tbody id="tbDesemp"></tbody>
+          </table>
+          <div class="empty" id="desempEmpty" style="display:none">
+            <div class="big">Nenhum orçamento neste período</div>
+            <div>Ajuste os filtros ou cadastre um novo orçamento.</div>
+          </div>
+        </div>
+      </section>
+
       <section class="view" id="view-pending"><div id="pendingBody"></div></section>
     </div>
   </div>
@@ -572,8 +608,8 @@ function saveStore(){
 var BRL = function(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});};
 var initials = function(n){return n.split(' ').filter(function(w){return w.length>2;}).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();};
 var stLabel = {fechou:'Fechou', em_aberto:'Em aberto', sem_orcamento:'Sem orçamento'};
-var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas','novo-orcamento':'Novo Orçamento',import:'Importar dados',pending:'Pendências'};
-var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas','novo-orcamento':'Dados / Novo Orçamento',import:'Dados / Importar',pending:'Revisão / Pendências'};
+var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas','novo-orcamento':'Novo Orçamento',desempenho:'Desempenho',import:'Importar dados',pending:'Pendências'};
+var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas','novo-orcamento':'Dados / Novo Orçamento',desempenho:'Dados / Desempenho',import:'Dados / Importar',pending:'Revisão / Pendências'};
 function norm(s){ if(!s) return ""; return s.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
 function titlecase(s){ if(!s) return ""; var low=['de','da','do','das','dos','e']; return s.toString().trim().split(/\s+/).map(function(w){var l=w.toLowerCase(); return low.indexOf(l)>=0?l:(l.charAt(0).toUpperCase()+l.slice(1));}).join(' '); }
 
@@ -602,9 +638,10 @@ document.querySelectorAll('.nav-item').forEach(function(b){b.onclick=function(){
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('pageTitle').textContent=titleOf[v];
   document.getElementById('crumb').textContent=crumbOf[v];
-  var semPeriodo=(v==='import'||v==='novo-orcamento'); document.getElementById('periodBar').style.display=semPeriodo?'none':'flex';
+  var semPeriodo=(v==='import'||v==='novo-orcamento'||v==='desempenho'); document.getElementById('periodBar').style.display=semPeriodo?'none':'flex';
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
+  if(v==='desempenho'){ carregarOrcamentos().then(desempRender); }
 };});
 document.getElementById('menuBtn').onclick=function(){document.getElementById('side').classList.toggle('show');};
 
@@ -1426,6 +1463,205 @@ function orcWire(){
   orcRecalcTotal();
 }
 
+/* ============ DESEMPENHO ============ */
+var ORCAMENTOS = [];
+var dFiltro = {ini:'', fim:'', mes:'', colab:'', open:{}};
+var CAIXA_FORMAS = ['Dinheiro','Débito','PIX','Financiamento'];
+var MES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var DESEMP_STATUS_LBL = {pago:'Pago', lancar:'Lançar', link_enviado:'Link Enviado', acompanhar:'Acompanhar'};
+var DESEMP_STATUS_CLS = {pago:'fechou', lancar:'em_aberto', link_enviado:'em_aberto', acompanhar:'sem_orcamento'};
+
+async function carregarOrcamentos(){
+  try{
+    var snap = await db.collection('painel_orcamentos').get();
+    ORCAMENTOS = [];
+    snap.forEach(function(doc){ var d=doc.data(); d._id=doc.id; ORCAMENTOS.push(d); });
+  }catch(e){
+    console.warn('Falha ao carregar orçamentos:', e);
+  }
+}
+
+function orcamentosVisiveis(){
+  if(!USUARIO_ATUAL) return [];
+  var p = USUARIO_ATUAL.perfil;
+  if(p==='gestora' || p==='coordenador') return ORCAMENTOS.slice();
+  if(p==='colaboradora'){
+    var email = (USUARIO_ATUAL.email||'').toLowerCase();
+    return ORCAMENTOS.filter(function(o){ return (o.colaboradora_email||'').toLowerCase() === email; });
+  }
+  return [];
+}
+
+function orcamentosFiltrados(){
+  return orcamentosVisiveis().filter(function(o){
+    var d = o.data_orcamento || '';
+    if(dFiltro.ini && d < dFiltro.ini) return false;
+    if(dFiltro.fim && d > dFiltro.fim) return false;
+    if(dFiltro.mes && o.mes !== dFiltro.mes) return false;
+    if(dFiltro.colab && o.colaboradora !== dFiltro.colab) return false;
+    return true;
+  });
+}
+
+function mesPT(ym){
+  var m = (ym||'').match(/^(\d{4})-(\d{2})$/);
+  if(!m) return ym||'';
+  var idx = parseInt(m[2],10)-1;
+  if(idx<0||idx>11) return ym;
+  return MES_PT[idx]+'/'+m[1];
+}
+function fmtDataBR(ymd){
+  var m = (ymd||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m) return ymd||'';
+  return m[3]+'/'+m[2]+'/'+m[1];
+}
+
+function desempRebuildFiltros(){
+  var base = orcamentosVisiveis();
+  var mesesMap={}, colabsMap={};
+  base.forEach(function(o){ if(o.mes) mesesMap[o.mes]=true; if(o.colaboradora) colabsMap[o.colaboradora]=true; });
+  var mesArr = Object.keys(mesesMap).sort().reverse();
+  var sm = document.getElementById('dMes');
+  sm.innerHTML = '<option value="">Todos os meses</option>'+mesArr.map(function(m){return '<option value="'+m+'"'+(m===dFiltro.mes?' selected':'')+'>'+mesPT(m)+'</option>';}).join('');
+  var sc = document.getElementById('dColab');
+  var colArr = Object.keys(colabsMap).sort();
+  sc.innerHTML = '<option value="">Todas</option>'+colArr.map(function(c){return '<option'+(c===dFiltro.colab?' selected':'')+'>'+c+'</option>';}).join('');
+  var wrap = document.getElementById('dColabWrap');
+  var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  if(p==='gestora'||p==='coordenador'){ wrap.style.display='flex'; }
+  else { wrap.style.display='none'; dFiltro.colab=''; sc.value=''; }
+}
+
+function desempRenderKPIs(rows){
+  var caixa=0, financ=0, pagoTotal=0, somaTotal=0;
+  var lifeEss=0, lifeOrto=0, nPago=0;
+  rows.forEach(function(o){
+    var formas = Array.isArray(o.formas_pagamento)?o.formas_pagamento:[];
+    formas.forEach(function(f){
+      var v = +f.valor || 0;
+      if(CAIXA_FORMAS.indexOf(f.forma)>=0) caixa += v;
+      if(f.forma==='Financiamento') financ += v;
+    });
+    var total = +o.total || 0;
+    somaTotal += total;
+    if(o.status==='pago'){ pagoTotal += total; nPago++; }
+    if(o.plano_odontologico){
+      if(o.life==='essencial') lifeEss++;
+      else if(o.life==='orto') lifeOrto++;
+    }
+  });
+  var n = rows.length;
+  var conv = n>0 ? (nPago/n*100) : 0;
+  var ticketOrcado = n>0 ? somaTotal/n : 0;
+  var ticketEfet = nPago>0 ? pagoTotal/nPago : 0;
+  function card(cls,lbl,val,sub){
+    return '<div class="kpi '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>';
+  }
+  document.getElementById('desempKpis').innerHTML =
+    card('k-sky','Qtd de orçamentos',n,'') +
+    card('k-green','Qtd efetivados',nPago,conv.toFixed(1)+'% de conversão') +
+    card('k-green','Efetivação realizado',BRL(pagoTotal),'soma do total dos pagos') +
+    card('k-sky','Caixa realizado',BRL(caixa),'Dinheiro · Débito · PIX · Financ.') +
+    card('k-amber','Financiamento',BRL(financ),'soma das formas Financiamento') +
+    card('k-sky','Ticket médio orçado',BRL(ticketOrcado),'') +
+    card('k-green','Ticket médio efetivado',BRL(ticketEfet),'') +
+    card('k-coral','Life Essencial',lifeEss,'orçamentos com plano') +
+    card('k-coral','Life Orto',lifeOrto,'orçamentos com plano');
+}
+
+function desempRenderLista(rows){
+  var tb = document.getElementById('tbDesemp');
+  var emp = document.getElementById('desempEmpty');
+  if(!rows.length){ tb.innerHTML=''; emp.style.display='block'; return; }
+  emp.style.display='none';
+  var sorted = rows.slice().sort(function(a,b){
+    var da=a.data_orcamento||'', dbb=b.data_orcamento||'';
+    if(da===dbb){ return (b.criado_em||'').localeCompare(a.criado_em||''); }
+    return da<dbb ? 1 : -1;
+  });
+  tb.innerHTML = sorted.map(function(o){
+    var id = o._id || '';
+    var isOpen = !!dFiltro.open[id];
+    var stCls = DESEMP_STATUS_CLS[o.status] || 'sem_orcamento';
+    var stLbl = DESEMP_STATUS_LBL[o.status] || (o.status||'—');
+    var detail='';
+    if(isOpen){
+      var esp = o.especialidades || {};
+      var nameMap = {endodontia:'Endodontia',clinico_geral:'Clínico Geral',implantodontia:'Implantodontia',protese:'Prótese',ortodontia:'Ortodontia'};
+      var espRows = ['endodontia','clinico_geral','implantodontia','protese','ortodontia']
+        .filter(function(k){return (+esp[k]||0)>0;})
+        .map(function(k){
+          var dpa = o.dentistas_por_area && o.dentistas_por_area[k];
+          return '<tr><td>'+nameMap[k]+'</td><td class="num">'+BRL(+esp[k]||0)+'</td><td style="color:var(--muted)">'+(dpa||'principal')+'</td></tr>';
+        }).join('');
+      if(!espRows) espRows='<tr><td colspan="3" style="color:var(--muted)">Sem valores por especialidade.</td></tr>';
+      var formas = Array.isArray(o.formas_pagamento)?o.formas_pagamento:[];
+      var formasHtml = formas.map(function(f){
+        var parc = f.parcelas?(' · '+f.parcelas+'x'):'';
+        return '<div>'+(f.forma||'—')+': '+BRL(+f.valor||0)+parc+'</div>';
+      }).join('') || '<span style="color:var(--muted)">—</span>';
+      var plano = o.plano_odontologico ? ('Sim'+(o.life?(' ('+(o.life==='essencial'?'Life Essencial':'Life Orto')+')'):'')) : 'Não';
+      var nf = o.nf_emitida ? 'Sim' : 'Não';
+      var obs = (o.observacoes||'').trim() || '<span style="color:var(--muted)">—</span>';
+      var descLine='';
+      if(o.desconto){
+        var dt = o.desconto.tipo==='%' ? ((+o.desconto.valor||0)+'%') : BRL(+o.desconto.valor||0);
+        descLine = '<div><b>Desconto:</b> '+dt+' <span style="color:var(--muted)">(aplicado: '+BRL(+o.desconto.calculado||0)+')</span></div>';
+      }
+      detail = '<tr class="detail"><td colspan="6"><div class="detail-inner">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px"><div>'
+          +'<table><thead><tr><th>Especialidade</th><th class="num">Valor</th><th>Dentista</th></tr></thead><tbody>'+espRows+'</tbody></table>'
+        +'</div><div style="padding:9px 12px;font-size:13px;line-height:1.65">'
+          +'<div><b>Subtotal:</b> '+BRL(+o.subtotal||0)+'</div>'
+          +descLine
+          +'<div><b>Total:</b> '+BRL(+o.total||0)+'</div>'
+          +'<div style="margin-top:8px"><b>Formas de pagamento:</b><div style="margin-left:8px">'+formasHtml+'</div></div>'
+          +'<div style="margin-top:8px"><b>Plano:</b> '+plano+' · <b>NF:</b> '+nf+'</div>'
+          +'<div style="margin-top:8px"><b>Obs:</b> '+obs+'</div>'
+        +'</div></div></div></td></tr>';
+    }
+    return '<tr class="clickable '+(isOpen?'open':'')+'" data-id="'+id+'">'
+      +'<td class="pac">'+(o.paciente||'—')+'</td>'
+      +'<td class="dent">'+(o.dentista||'—')+'</td>'
+      +'<td class="num big">'+BRL(+o.total||0)+'</td>'
+      +'<td><span class="badge '+stCls+'">'+stLbl+'</span></td>'
+      +'<td>'+(o.colaboradora||'—')+'</td>'
+      +'<td>'+fmtDataBR(o.data_orcamento)+'</td>'
+      +'</tr>'+detail;
+  }).join('');
+  tb.querySelectorAll('tr[data-id]').forEach(function(tr){
+    tr.onclick = function(){
+      var id = tr.dataset.id;
+      dFiltro.open[id] = !dFiltro.open[id];
+      desempRenderLista(rows);
+    };
+  });
+}
+
+function desempRender(){
+  desempRebuildFiltros();
+  var rows = orcamentosFiltrados();
+  desempRenderKPIs(rows);
+  desempRenderLista(rows);
+}
+
+var desempWired=false;
+function desempWire(){
+  if(desempWired) return; desempWired=true;
+  document.getElementById('dDataIni').addEventListener('change',function(e){ dFiltro.ini=e.target.value; desempRender(); });
+  document.getElementById('dDataFim').addEventListener('change',function(e){ dFiltro.fim=e.target.value; desempRender(); });
+  document.getElementById('dMes').addEventListener('change',function(e){ dFiltro.mes=e.target.value; desempRender(); });
+  document.getElementById('dColab').addEventListener('change',function(e){ dFiltro.colab=e.target.value; desempRender(); });
+  document.getElementById('btnLimparDesemp').addEventListener('click',function(){
+    dFiltro={ini:'', fim:'', mes:'', colab:'', open:{}};
+    document.getElementById('dDataIni').value='';
+    document.getElementById('dDataFim').value='';
+    document.getElementById('dMes').value='';
+    document.getElementById('dColab').value='';
+    desempRender();
+  });
+}
+
 var booted=false;
 async function boot(){
   if(booted)return; booted=true;
@@ -1433,6 +1669,9 @@ async function boot(){
   if(!ok) loadStore();
   rebuildFilters(); renderHist(); renderAll();
   orcWire();
+  desempWire();
+  await carregarOrcamentos();
+  desempRender();
 }
 
 </script>

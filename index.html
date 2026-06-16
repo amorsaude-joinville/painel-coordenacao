@@ -178,8 +178,8 @@ td{padding:13px 18px;vertical-align:middle}
 .hist-item .hinfo{flex:1;min-width:0}
 .hist-item .hinfo .ht{font-weight:600;font-size:13.5px}
 .hist-item .hinfo .hs{font-size:11.5px;color:var(--muted)}
-.hist-item .hdel{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--coral);font-family:inherit}
-.hist-item .hdel:hover{background:var(--coral-soft);border-color:var(--coral)}
+.hdel{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--coral);font-family:inherit}
+.hdel:hover{background:var(--coral-soft);border-color:var(--coral)}
 .warn-box{background:var(--amber-soft);border:1px solid #ecd9b0;border-radius:10px;padding:13px 16px;font-size:12.5px;color:#8a5a14;margin-bottom:20px;display:flex;gap:10px}
 .warn-box svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
 @media(max-width:880px){
@@ -568,6 +568,7 @@ td{padding:13px 18px;vertical-align:middle}
               <th>Status</th>
               <th>Colaboradora</th>
               <th>Data</th>
+              <th>Ações</th>
             </tr></thead>
             <tbody id="tbDesemp"></tbody>
           </table>
@@ -1723,7 +1724,7 @@ function desempRenderLista(rows){
         var dt = o.desconto.tipo==='%' ? ((+o.desconto.valor||0)+'%') : BRL(+o.desconto.valor||0);
         descLine = '<div><b>Desconto:</b> '+dt+' <span style="color:var(--muted)">(aplicado: '+BRL(+o.desconto.calculado||0)+')</span></div>';
       }
-      detail = '<tr class="detail"><td colspan="6"><div class="detail-inner">'
+      detail = '<tr class="detail"><td colspan="7"><div class="detail-inner">'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px"><div>'
           +'<table><thead><tr><th>Especialidade</th><th class="num">Valor</th><th>Dentista</th></tr></thead><tbody>'+espRows+'</tbody></table>'
         +'</div><div style="padding:9px 12px;font-size:13px;line-height:1.65">'
@@ -1735,6 +1736,11 @@ function desempRenderLista(rows){
           +'<div style="margin-top:8px"><b>Obs:</b> '+obs+'</div>'
         +'</div></div></div></td></tr>';
     }
+    var pAtual = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+    var podeExcluir = (pAtual==='gestora' || pAtual==='coordenador');
+    var actCell = podeExcluir
+      ? '<td><button class="hdel orc-del" data-id="'+id+'">Excluir</button></td>'
+      : '<td></td>';
     return '<tr class="clickable '+(isOpen?'open':'')+'" data-id="'+id+'">'
       +'<td class="pac">'+(o.paciente||'—')+'</td>'
       +'<td class="dent">'+(o.dentista||'—')+'</td>'
@@ -1742,6 +1748,7 @@ function desempRenderLista(rows){
       +'<td><span class="badge '+stCls+'">'+stLbl+'</span></td>'
       +'<td>'+(o.colaboradora||'—')+'</td>'
       +'<td>'+fmtDataBR(o.data_orcamento)+'</td>'
+      +actCell
       +'</tr>'+detail;
   }).join('');
   tb.querySelectorAll('tr[data-id]').forEach(function(tr){
@@ -1751,6 +1758,33 @@ function desempRenderLista(rows){
       desempRenderLista(rows);
     };
   });
+  tb.querySelectorAll('button.orc-del').forEach(function(btn){
+    btn.onclick = function(e){
+      e.stopPropagation();
+      excluirOrcamento(btn.dataset.id);
+    };
+  });
+}
+
+async function excluirOrcamento(id){
+  if(!USUARIO_ATUAL) return;
+  var p = USUARIO_ATUAL.perfil;
+  if(p !== 'gestora' && p !== 'coordenador') return;
+  var o = ORCAMENTOS.find(function(x){return x._id === id;});
+  if(!o) return;
+  var nome = o.paciente || '—';
+  var total = BRL(+o.total||0);
+  var colab = o.colaboradora || '—';
+  if(!confirm('Excluir o orçamento de '+nome+' ('+total+') lançado por '+colab+'? Esta ação é permanente e não pode ser desfeita.')) return;
+  try{
+    await db.collection('painel_orcamentos').doc(id).delete();
+    ORCAMENTOS = ORCAMENTOS.filter(function(x){return x._id !== id;});
+    if(dFiltro.open) delete dFiltro.open[id];
+    desempRender();
+  }catch(e){
+    console.warn('Falha ao excluir orçamento:', e);
+    alert('Erro ao excluir ('+(e.message||e)+'). Tente novamente.');
+  }
 }
 
 function desempRender(){

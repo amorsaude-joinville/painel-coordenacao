@@ -780,7 +780,27 @@ function dadosFiltrados(){
 
 /* ============ NAV ============ */
 document.getElementById('today').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function aplicarPermissoesMenu(){
+  if(!USUARIO_ATUAL) return;
+  var p = USUARIO_ATUAL.perfil;
+  var permitidasColab = ['producao','desempenho'];
+  var pausadas = ['novo-orcamento','nf']; // ocultas para todos os perfis
+  document.querySelectorAll('.nav-item').forEach(function(b){
+    var v = b.dataset.view;
+    if(pausadas.indexOf(v) >= 0){ b.style.display = 'none'; return; }
+    if(p === 'colaboradora'){
+      b.style.display = (permitidasColab.indexOf(v) >= 0) ? '' : 'none';
+    } else {
+      b.style.display = '';
+    }
+  });
+}
+
 function ativarAba(v){
+  // Defesa: colaboradora só pode acessar 'producao' ou 'desempenho'
+  if(USUARIO_ATUAL && USUARIO_ATUAL.perfil === 'colaboradora'){
+    if(v !== 'producao' && v !== 'desempenho') v = 'producao';
+  }
   var btn = document.querySelector('.nav-item[data-view="'+v+'"]');
   if(!btn) return false;
   document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('on');});
@@ -2193,9 +2213,16 @@ async function boot(){
   producaoWire();
   await Promise.all([carregarOrcamentos(), carregarMetas(), carregarProducao()]);
   desempRender();
+  aplicarPermissoesMenu();
   try{
     var ultima = sessionStorage.getItem('amorsaude_ultima_aba');
-    if(ultima && document.querySelector('.nav-item[data-view="'+ultima+'"]')) ativarAba(ultima);
+    var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+    if(p === 'colaboradora'){
+      if(ultima === 'producao' || ultima === 'desempenho') ativarAba(ultima);
+      else ativarAba('producao');
+    } else {
+      if(ultima && document.querySelector('.nav-item[data-view="'+ultima+'"]')) ativarAba(ultima);
+    }
   }catch(e){}
 }
 

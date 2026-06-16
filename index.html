@@ -190,6 +190,31 @@ td{padding:13px 18px;vertical-align:middle}
 }
 .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;margin-right:12px}
 .menu-btn svg{width:20px;height:20px}
+/* NOVO ORÇAMENTO */
+.orc-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;max-width:980px}
+.orc-section-h{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 12px;border-top:1px solid var(--line);padding-top:18px;font-weight:600}
+.orc-section-h.first{margin-top:0;border-top:none;padding-top:0}
+.orc-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+.orc-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:14px}
+@media(max-width:760px){.orc-grid-2,.orc-grid-3{grid-template-columns:1fr}}
+.orc-field{min-width:0}
+.orc-field label{display:block;font-size:12.5px;color:var(--ink);font-weight:500;margin-bottom:6px}
+.orc-field label .req{color:var(--coral)}
+.orc-field input[type=text],.orc-field input[type=number],.orc-field select,.orc-field textarea{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.orc-field input:focus,.orc-field select:focus,.orc-field textarea:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
+.orc-field textarea{resize:vertical;min-height:80px}
+.orc-dent-list{width:100%;padding:6px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;margin-top:8px;color:var(--ink)}
+.orc-dent-list option{padding:6px 10px;border-radius:6px}
+.orc-check{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14px;background:#fff;user-select:none}
+.orc-check input{margin:0;cursor:pointer;width:16px;height:16px;accent-color:var(--sky)}
+.orc-radios{display:flex;gap:10px;flex-wrap:wrap}
+.orc-radio{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14px;background:#fff;user-select:none}
+.orc-radio input{margin:0;cursor:pointer;accent-color:var(--sky)}
+.orc-desconto{display:grid;grid-template-columns:1fr 90px;gap:8px}
+.orc-total-box{background:var(--green-soft);border:1px solid #b8dfd1;border-radius:12px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;margin:18px 0;flex-wrap:wrap;gap:10px}
+.orc-total-box .lbl{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:600}
+.orc-total-box .val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--green);letter-spacing:-.02em}
+.orc-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 
 </style>
 </head>
@@ -219,6 +244,7 @@ td{padding:13px 18px;vertical-align:middle}
       <button class="nav-item" data-view="colabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5M17 17a3 3 0 1 0 6 0 3 3 0 0 0-6 0zM7 7a3 3 0 1 0-6 0 3 3 0 0 0 6 0z"/></svg>Colaboradoras</button>
       <button class="nav-item" data-view="dentists"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5.5C10 3.5 6 3.5 6 8c0 4 1.5 5 2 9 .3 2.5 3 2.5 3 0 0-2 .5-3 1-3s1 1 1 3c0 2.5 2.7 2.5 3 0 .5-4 2-5 2-9 0-4.5-4-4.5-6-2.5z"/></svg>Dentistas</button>
       <div class="nav-label">Dados</div>
+      <button class="nav-item" data-view="novo-orcamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Novo Orçamento</button>
       <button class="nav-item" data-view="import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar dados</button>
       <button class="nav-item" data-view="pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pendências<span class="badge-n" id="pendCount">0</span></button>
     </nav>
@@ -350,6 +376,100 @@ td{padding:13px 18px;vertical-align:middle}
         </div>
       </section>
 
+      <!-- NOVO ORÇAMENTO VIEW -->
+      <section class="view" id="view-novo-orcamento">
+        <div class="orc-card">
+          <div class="orc-section-h first">Dados do paciente</div>
+          <div class="orc-grid-2">
+            <div class="orc-field">
+              <label>Nome do paciente <span class="req">*</span></label>
+              <input type="text" id="orcPaciente" placeholder="Nome completo" autocomplete="off">
+            </div>
+            <div class="orc-field">
+              <label>CPF <span class="req">*</span></label>
+              <input type="text" id="orcCPF" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="orc-section-h">Dentista solicitante <span class="req" style="color:var(--coral)">*</span></div>
+          <div class="orc-field">
+            <label>Buscar dentista</label>
+            <input type="text" id="orcDentBusca" placeholder="Digite para filtrar..." autocomplete="off">
+            <select size="6" id="orcDentLista" class="orc-dent-list"></select>
+          </div>
+
+          <div class="orc-section-h">Valores por especialidade (R$)</div>
+          <div class="orc-grid-3">
+            <div class="orc-field"><label>Endodontia</label><input type="text" id="orcVlrEndo" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field"><label>Clínico Geral</label><input type="text" id="orcVlrClinico" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field"><label>Implantodontia</label><input type="text" id="orcVlrImplante" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+          </div>
+          <div class="orc-grid-2">
+            <div class="orc-field"><label>Prótese</label><input type="text" id="orcVlrProtese" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="orc-field"><label>Ortodontia</label><input type="text" id="orcVlrOrto" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+          </div>
+
+          <div class="orc-section-h">Plano e nota fiscal</div>
+          <div class="orc-grid-2">
+            <label class="orc-check"><input type="checkbox" id="orcPlano"> Tem plano odontológico incluso?</label>
+            <label class="orc-check"><input type="checkbox" id="orcNF"> NF já foi emitida?</label>
+          </div>
+          <div class="orc-radios" id="orcLifeBox" style="display:none;margin-bottom:14px">
+            <label class="orc-radio"><input type="radio" name="orcLife" value="essencial"> Life Essencial</label>
+            <label class="orc-radio"><input type="radio" name="orcLife" value="orto"> Life Orto</label>
+          </div>
+
+          <div class="orc-section-h">Desconto</div>
+          <div class="orc-field" style="max-width:360px">
+            <label>Valor do desconto</label>
+            <div class="orc-desconto">
+              <input type="text" id="orcDescontoVal" placeholder="0,00" inputmode="decimal" autocomplete="off">
+              <select id="orcDescontoTipo"><option value="R$">R$</option><option value="%">%</option></select>
+            </div>
+          </div>
+
+          <div class="orc-total-box">
+            <div class="lbl">Total</div>
+            <div class="val" id="orcTotal">R$ 0,00</div>
+          </div>
+
+          <div class="orc-section-h">Pagamento</div>
+          <div class="orc-field" style="margin-bottom:16px">
+            <label>Status <span class="req">*</span></label>
+            <div class="orc-radios">
+              <label class="orc-radio"><input type="radio" name="orcStatus" value="pago" checked> Pago</label>
+              <label class="orc-radio"><input type="radio" name="orcStatus" value="lancar"> Lançar</label>
+              <label class="orc-radio"><input type="radio" name="orcStatus" value="link_enviado"> Link Enviado</label>
+              <label class="orc-radio"><input type="radio" name="orcStatus" value="acompanhar"> Acompanhar</label>
+            </div>
+          </div>
+          <div class="orc-field" style="max-width:360px">
+            <label>Forma de pagamento</label>
+            <select id="orcFormaPag">
+              <option>Dinheiro</option>
+              <option>PIX</option>
+              <option>Débito</option>
+              <option>Crédito à vista</option>
+              <option>Crédito parcelado</option>
+              <option>Financiamento</option>
+              <option>Boleto</option>
+            </select>
+          </div>
+
+          <div class="orc-section-h">Observações</div>
+          <div class="orc-field">
+            <label>Anotações (opcional, máx 250 caracteres)</label>
+            <textarea id="orcObs" maxlength="250" placeholder="Detalhes adicionais do orçamento..."></textarea>
+          </div>
+
+          <div class="orc-actions">
+            <button type="button" class="btn" id="btnSalvarOrc">Salvar Orçamento</button>
+            <button type="button" class="btn btn-ghost" id="btnLimparOrc">Limpar</button>
+          </div>
+          <div class="imp-msg" id="orcMsg" style="margin-left:0"></div>
+        </div>
+      </section>
+
       <section class="view" id="view-pending"><div id="pendingBody"></div></section>
     </div>
   </div>
@@ -399,8 +519,8 @@ function saveStore(){
 var BRL = function(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});};
 var initials = function(n){return n.split(' ').filter(function(w){return w.length>2;}).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();};
 var stLabel = {fechou:'Fechou', em_aberto:'Em aberto', sem_orcamento:'Sem orçamento'};
-var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas',import:'Importar dados',pending:'Pendências'};
-var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas',import:'Dados / Importar',pending:'Revisão / Pendências'};
+var titleOf = {overview:'Visão geral',patients:'Pacientes',colabs:'Colaboradoras',dentists:'Dentistas','novo-orcamento':'Novo Orçamento',import:'Importar dados',pending:'Pendências'};
+var crumbOf = {overview:'Gestão / Visão geral',patients:'Gestão / Pacientes',colabs:'Gestão / Colaboradoras',dentists:'Gestão / Dentistas','novo-orcamento':'Dados / Novo Orçamento',import:'Dados / Importar',pending:'Revisão / Pendências'};
 function norm(s){ if(!s) return ""; return s.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," "); }
 function titlecase(s){ if(!s) return ""; var low=['de','da','do','das','dos','e']; return s.toString().trim().split(/\s+/).map(function(w){var l=w.toLowerCase(); return low.indexOf(l)>=0?l:(l.charAt(0).toUpperCase()+l.slice(1));}).join(' '); }
 
@@ -429,7 +549,7 @@ document.querySelectorAll('.nav-item').forEach(function(b){b.onclick=function(){
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('pageTitle').textContent=titleOf[v];
   document.getElementById('crumb').textContent=crumbOf[v];
-  document.getElementById('periodBar').style.display = (v==='import')?'none':'flex';
+  var semPeriodo=(v==='import'||v==='novo-orcamento'); document.getElementById('periodBar').style.display=semPeriodo?'none':'flex';
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
 };});
@@ -961,12 +1081,149 @@ async function carregarDoFirebase(){
   }
 }
 
+/* ============ NOVO ORÇAMENTO ============ */
+var ORC_DENTISTAS = [
+  'Dr André Frederico',
+  'Dr José Luís Wessler Da Costa',
+  'Dr Leandro Lemes da Costa',
+  'Dr Maynell Ramos Prado Silva',
+  'Dr Wagner Dall Agnol Zabot',
+  'Dr. Valter Seminano Vavassori',
+  'Dra Amanda Helena Rabêlo',
+  'Dra Ana Carolina Thompson Reategue',
+  'Dra Brenda Hoanna Borges De Mendonça',
+  'Dra Erica Patricia Bregalda',
+  'Dra Evelyn Alberto Vasconcelos De Souza',
+  'Dra Nayara Alves',
+  'Dra Roberta Guimarães de Sá',
+  'Dra. Natalia Paniz'
+];
+function brToNum(t){
+  if(t===null||t===undefined||t==='') return 0;
+  if(typeof t==='number') return t;
+  var s=(''+t).trim();
+  if(!s) return 0;
+  s=s.replace(/\s+/g,'').replace(/R\$/g,'').replace(/\./g,'').replace(',','.');
+  var n=parseFloat(s);
+  return isNaN(n)?0:n;
+}
+function numToBR(n){
+  if(n===null||n===undefined||isNaN(n)) return '0,00';
+  return (+n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function orcRenderDentList(filter){
+  var sel=document.getElementById('orcDentLista');
+  var f=(filter||'').trim().toLowerCase();
+  sel.innerHTML=ORC_DENTISTAS.filter(function(d){return !f||d.toLowerCase().indexOf(f)>=0;})
+    .map(function(d){return '<option>'+d+'</option>';}).join('');
+}
+function orcRecalcTotal(){
+  var ids=['orcVlrEndo','orcVlrClinico','orcVlrImplante','orcVlrProtese','orcVlrOrto'];
+  var soma=ids.reduce(function(acc,id){return acc+brToNum(document.getElementById(id).value);},0);
+  var descV=brToNum(document.getElementById('orcDescontoVal').value);
+  var descTipo=document.getElementById('orcDescontoTipo').value;
+  var desconto=descTipo==='%'?soma*(descV/100):descV;
+  var total=Math.max(0,soma-desconto);
+  document.getElementById('orcTotal').textContent='R$ '+numToBR(total);
+}
+function limparOrcamento(){
+  ['orcPaciente','orcCPF','orcDentBusca','orcVlrEndo','orcVlrClinico','orcVlrImplante','orcVlrProtese','orcVlrOrto','orcDescontoVal','orcObs'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('orcPlano').checked=false;
+  document.getElementById('orcNF').checked=false;
+  document.getElementById('orcDescontoTipo').value='R$';
+  document.getElementById('orcFormaPag').value='Dinheiro';
+  document.querySelectorAll('input[name=orcLife]').forEach(function(r){r.checked=false;});
+  var pago=document.querySelector('input[name=orcStatus][value=pago]'); if(pago) pago.checked=true;
+  document.getElementById('orcLifeBox').style.display='none';
+  orcRenderDentList('');
+  document.getElementById('orcDentLista').selectedIndex=-1;
+  document.getElementById('orcMsg').className='imp-msg';
+  document.getElementById('orcTotal').textContent='R$ 0,00';
+}
+async function salvarOrcamento(){
+  var msg=document.getElementById('orcMsg');
+  function show(t,cls){msg.className='imp-msg show '+cls; msg.textContent=t;}
+  var paciente=document.getElementById('orcPaciente').value.trim();
+  var cpf=document.getElementById('orcCPF').value.trim();
+  var dent=document.getElementById('orcDentLista').value;
+  if(!paciente){show('Informe o nome do paciente.','err'); return;}
+  if(!cpf||cpf.replace(/\D/g,'').length<11){show('CPF inválido. Use o formato 000.000.000-00.','err'); return;}
+  if(!dent){show('Selecione o dentista solicitante na lista.','err'); return;}
+  var vEndo=brToNum(document.getElementById('orcVlrEndo').value);
+  var vClin=brToNum(document.getElementById('orcVlrClinico').value);
+  var vImpl=brToNum(document.getElementById('orcVlrImplante').value);
+  var vProt=brToNum(document.getElementById('orcVlrProtese').value);
+  var vOrto=brToNum(document.getElementById('orcVlrOrto').value);
+  var soma=vEndo+vClin+vImpl+vProt+vOrto;
+  var descV=brToNum(document.getElementById('orcDescontoVal').value);
+  var descTipo=document.getElementById('orcDescontoTipo').value;
+  var desconto=descTipo==='%'?soma*(descV/100):descV;
+  var total=Math.max(0,soma-desconto);
+  var plano=document.getElementById('orcPlano').checked;
+  var life=null;
+  if(plano){var lr=document.querySelector('input[name=orcLife]:checked'); if(lr) life=lr.value;}
+  var nf=document.getElementById('orcNF').checked;
+  var sr=document.querySelector('input[name=orcStatus]:checked');
+  var status=sr?sr.value:'pago';
+  var formaPag=document.getElementById('orcFormaPag').value;
+  var obs=document.getElementById('orcObs').value.trim();
+  var hoje=new Date();
+  var ymd=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  var ym=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  var registro={
+    paciente:paciente, cpf:cpf, dentista:dent,
+    especialidades:{endodontia:vEndo, clinico_geral:vClin, implantodontia:vImpl, protese:vProt, ortodontia:vOrto},
+    subtotal:Math.round(soma*100)/100,
+    desconto:{valor:descV, tipo:descTipo, calculado:Math.round(desconto*100)/100},
+    total:Math.round(total*100)/100,
+    plano_odontologico:plano, life:life, nf_emitida:nf,
+    status:status, forma_pagamento:formaPag, observacoes:obs,
+    colaboradora:'Não identificada',
+    data_orcamento:ymd, criado_em:hoje.toISOString(), mes:ym
+  };
+  try{
+    await db.collection('painel_orcamentos').doc('orc_'+Date.now()).set(registro);
+    show('Orçamento salvo com sucesso!','ok');
+    limparOrcamento();
+  }catch(e){
+    console.warn('Firebase write orcamento falhou:', e);
+    show('Erro ao salvar na nuvem ('+(e.message||e)+'). Os dados continuam no formulário, tente novamente.','err');
+  }
+}
+var orcWired=false;
+function orcWire(){
+  if(orcWired) return; orcWired=true;
+  orcRenderDentList('');
+  document.getElementById('orcDentBusca').addEventListener('input',function(e){orcRenderDentList(e.target.value);});
+  document.getElementById('orcCPF').addEventListener('input',function(e){
+    var v=e.target.value.replace(/\D/g,'').slice(0,11);
+    var out=v;
+    if(v.length>9) out=v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+    else if(v.length>6) out=v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+    else if(v.length>3) out=v.slice(0,3)+'.'+v.slice(3);
+    e.target.value=out;
+  });
+  ['orcVlrEndo','orcVlrClinico','orcVlrImplante','orcVlrProtese','orcVlrOrto','orcDescontoVal'].forEach(function(id){
+    document.getElementById(id).addEventListener('input',orcRecalcTotal);
+  });
+  document.getElementById('orcDescontoTipo').addEventListener('change',orcRecalcTotal);
+  document.getElementById('orcPlano').addEventListener('change',function(e){
+    var box=document.getElementById('orcLifeBox');
+    if(e.target.checked){ box.style.display='flex'; }
+    else { box.style.display='none'; box.querySelectorAll('input[type=radio]').forEach(function(r){r.checked=false;}); }
+  });
+  document.getElementById('btnSalvarOrc').addEventListener('click',salvarOrcamento);
+  document.getElementById('btnLimparOrc').addEventListener('click',limparOrcamento);
+  orcRecalcTotal();
+}
+
 var booted=false;
 async function boot(){
   if(booted)return; booted=true;
   var ok = await carregarDoFirebase();
   if(!ok) loadStore();
   rebuildFilters(); renderHist(); renderAll();
+  orcWire();
 }
 
 </script>

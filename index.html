@@ -1373,7 +1373,9 @@ async function salvarOrcamento(){
     total:totalRound,
     plano_odontologico:plano, life:life, nf_emitida:nf,
     status:status, formas_pagamento:formas, observacoes:obs,
-    colaboradora:'Não identificada',
+    colaboradora:(USUARIO_ATUAL?USUARIO_ATUAL.nome:'Não identificada'),
+    colaboradora_email:(USUARIO_ATUAL?USUARIO_ATUAL.email:null),
+    colaboradora_perfil:(USUARIO_ATUAL?USUARIO_ATUAL.perfil:null),
     data_orcamento:ymd, criado_em:hoje.toISOString(), mes:ym
   };
   try{

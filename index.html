@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 
@@ -241,9 +242,10 @@ td{padding:13px 18px;vertical-align:middle}
   <div class="lock-card">
     <div class="lock-logo"><svg viewBox="0 0 48 48" fill="none"><rect x="9" y="14" width="30" height="27" rx="6" stroke="#62bdd4" stroke-width="3"/><circle cx="24" cy="13" r="9.5" fill="#fff" stroke="#62bdd4" stroke-width="3"/><path d="M24 9.5c-1.4-2.4-5-1.8-5 1.1 0 1.9 2.4 3.6 5 5.4 2.6-1.8 5-3.5 5-5.4 0-2.9-3.6-3.5-5-1.1z" fill="#d94436"/><path d="M23.2 11h1.6v3.4h-1.6zM22.3 11.9h3.4v1.6h-3.4z" fill="#fff"/><circle cx="19" cy="26" r="2.4" fill="#62bdd4"/><circle cx="29" cy="26" r="2.4" fill="#62bdd4"/><path d="M18 31c2 2.4 10 2.4 12 0" stroke="#62bdd4" stroke-width="3" stroke-linecap="round"/></svg></div>
     <h2>AmorSaúde Joinville</h2><p>Painel da Coordenação Odontológica</p>
-    <div class="lock-field"><input type="password" id="lockInput" placeholder="Digite a senha de acesso" autocomplete="off" autofocus></div>
-    <button class="lock-btn" id="lockBtn">Entrar</button>
-    <div class="lock-err" id="lockErr"></div>
+    <div class="lock-field"><input type="email" id="loginEmail" placeholder="E-mail" autocomplete="username" autofocus></div>
+    <div class="lock-field"><input type="password" id="loginSenha" placeholder="Senha" autocomplete="current-password"></div>
+    <button class="lock-btn" id="loginBtn">Entrar</button>
+    <div class="lock-err" id="loginErr"></div>
     <div class="lock-foot">Acesso restrito · dados confidenciais de pacientes</div>
   </div>
 </div>
@@ -265,7 +267,11 @@ td{padding:13px 18px;vertical-align:middle}
       <button class="nav-item" data-view="import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar dados</button>
       <button class="nav-item" data-view="pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pendências<span class="badge-n" id="pendCount">0</span></button>
     </nav>
-    <div class="side-foot"><div class="who"><span class="dot"></span> Iverson Richter</div><div>Coordenador odontológico</div></div>
+    <div class="side-foot">
+      <div class="who"><span class="dot"></span> <span id="sideUserName">—</span></div>
+      <div id="sideUserPerfil">—</div>
+      <a href="#" id="btnSair" style="display:inline-block;margin-top:10px;color:#fff;opacity:.85;font-size:11.5px;text-decoration:underline;cursor:pointer">Sair</a>
+    </div>
   </aside>
 
   <div class="main">
@@ -523,6 +529,18 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
+var auth = firebase.auth();
+
+/* ============ USUÁRIOS / PERFIS ============ */
+var USUARIOS = {
+  "eduardaaraujo1502@gmail.com": {nome:"Eduarda", perfil:"gestora"},
+  "iversonrichter3@gmail.com":   {nome:"Iverson", perfil:"coordenador"},
+  "dangeallima@gmail.com":            {nome:"Angela",   perfil:"colaboradora"},
+  "andressafelixdarosa@gmail.com":    {nome:"Andressa", perfil:"colaboradora"},
+  "nicolemonteirosoares@gmail.com":   {nome:"Nicole",   perfil:"colaboradora"},
+  "pathy2001santos@gmail.com":        {nome:"Patricia", perfil:"colaboradora"}
+};
+var USUARIO_ATUAL = null;
 
 /* ============ ESTADO GLOBAL ============ */
 var STORE_KEY = "amorsaude_painel_dados_v1";
@@ -1043,21 +1061,59 @@ document.getElementById('btnCancelar').onclick=function(){
 /* ============ SHA256 ============ */
 function sha256(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");});}
 
-/* ============ LOGIN ============ */
+/* ============ LOGIN (Firebase Auth) ============ */
 (function(){
-  var HASH="70f98d48e317d550803e1e8e1aad1bb3cc902b4d0905abf3d49f9dd51d00eff4";
-  var SESSION_KEY="amorsaude_sessao_ok";
-  function unlock(){ document.getElementById("lockScreen").classList.add("hidden"); boot(); }
-  function tryUnlock(){
-    var v=document.getElementById("lockInput").value; if(!v)return;
-    sha256(v).then(function(h){
-      if(h===HASH){ sessionStorage.setItem(SESSION_KEY,"1"); unlock(); }
-      else{ document.getElementById("lockErr").textContent="Senha incorreta. Tente novamente."; document.getElementById("lockInput").value=""; document.getElementById("lockInput").focus(); }
-    });
+  function showErr(t){ document.getElementById("loginErr").textContent=t||""; }
+  function applyUserToUI(){
+    if(!USUARIO_ATUAL) return;
+    document.getElementById('sideUserName').textContent = USUARIO_ATUAL.nome;
+    var p = USUARIO_ATUAL.perfil;
+    document.getElementById('sideUserPerfil').textContent = p.charAt(0).toUpperCase()+p.slice(1);
   }
-  if(sessionStorage.getItem(SESSION_KEY)==="1"){ unlock(); return; }
-  document.getElementById("lockBtn").addEventListener("click",tryUnlock);
-  document.getElementById("lockInput").addEventListener("keydown",function(e){if(e.key==="Enter")tryUnlock();});
+  async function tryLogin(){
+    showErr("");
+    var email=(document.getElementById("loginEmail").value||"").trim().toLowerCase();
+    var senha=document.getElementById("loginSenha").value;
+    if(!email||!senha){ showErr("Preencha e-mail e senha."); return; }
+    var btn=document.getElementById("loginBtn"); btn.disabled=true;
+    try{
+      await auth.signInWithEmailAndPassword(email, senha);
+      // onAuthStateChanged cuida do resto
+    }catch(e){
+      console.warn("Login falhou:", e);
+      showErr("E-mail ou senha incorretos.");
+    }finally{
+      btn.disabled=false;
+    }
+  }
+  auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+  auth.onAuthStateChanged(function(user){
+    if(user){
+      var email=(user.email||"").toLowerCase();
+      var info=USUARIOS[email];
+      if(!info){
+        showErr("Usuário sem perfil configurado. Contate a gestora.");
+        auth.signOut();
+        USUARIO_ATUAL=null;
+        return;
+      }
+      USUARIO_ATUAL={email:email, nome:info.nome, perfil:info.perfil};
+      applyUserToUI();
+      document.getElementById("lockScreen").classList.add("hidden");
+      boot();
+    } else {
+      USUARIO_ATUAL=null;
+      document.getElementById("lockScreen").classList.remove("hidden");
+      document.getElementById("loginSenha").value="";
+    }
+  });
+  document.getElementById("loginBtn").addEventListener("click", tryLogin);
+  document.getElementById("loginEmail").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+  document.getElementById("loginSenha").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+  document.getElementById("btnSair").addEventListener("click", function(e){
+    e.preventDefault();
+    auth.signOut().then(function(){ location.reload(); });
+  });
 })();
 
 /* ============ ADMIN GATE ============ */

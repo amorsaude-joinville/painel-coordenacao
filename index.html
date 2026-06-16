@@ -233,6 +233,36 @@ td{padding:13px 18px;vertical-align:middle}
 .orc-pag-remove:hover{background:var(--coral-soft);border-color:var(--coral)}
 .orc-add-pag{background:none;border:1px dashed var(--line);border-radius:10px;color:var(--sky-deep);font-size:13px;padding:10px 14px;cursor:pointer;margin-top:10px;font-family:inherit;display:inline-block}
 .orc-add-pag:hover{border-color:var(--sky);background:var(--sky-soft)}
+/* METAS no KPI */
+.kpi-meta{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.kpi-meta b{color:var(--ink);font-weight:600}
+.kpi-pct{font-weight:700;padding:2px 8px;border-radius:6px;font-size:11.5px;font-family:inherit;display:inline-block}
+.kpi-pct.ok{background:var(--green-soft);color:var(--green)}
+.kpi-pct.warn{background:var(--amber-soft);color:var(--amber)}
+.kpi-pct.bad{background:var(--coral-soft);color:var(--coral)}
+.kpi-pct.none{background:#eef1f3;color:var(--muted);font-weight:500}
+/* Modal de Metas */
+.metas-overlay{position:fixed;inset:0;z-index:200;background:rgba(31,42,46,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.metas-overlay.show{display:flex}
+.metas-modal{background:var(--card);border-radius:14px;max-width:1100px;width:100%;padding:26px 28px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.metas-modal h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.metas-modal .desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.metas-mes-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.metas-mes-row label{font-size:12.5px;color:var(--ink);font-weight:600}
+.metas-mes-row input[type=month]{padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff}
+.metas-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.metas-table th{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:600}
+.metas-table th.num{text-align:right}
+.metas-table td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.metas-table tr:last-child td{border-bottom:none}
+.metas-table tr.equipe-row td{font-weight:600;background:var(--sky-soft)}
+.metas-table input{width:100%;min-width:90px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;text-align:right}
+.metas-table input:focus{outline:2px solid var(--sky);outline-offset:-1px;border-color:transparent}
+.metas-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.metas-msg{margin-top:14px;font-size:13px;padding:11px 15px;border-radius:9px;display:none}
+.metas-msg.show{display:block}
+.metas-msg.ok{background:var(--green-soft);color:var(--green)}
+.metas-msg.err{background:var(--coral-soft);color:var(--coral)}
 
 </style>
 </head>
@@ -526,6 +556,7 @@ td{padding:13px 18px;vertical-align:middle}
             <select id="dColab" style="font-size:13px;padding:9px 12px"></select>
           </span>
           <button id="btnLimparDesemp" class="btn btn-ghost" style="font-size:13px;padding:8px 14px">Limpar filtros</button>
+          <button id="btnCfgMetas" class="btn btn-ghost" style="font-size:13px;padding:8px 14px;display:none;margin-left:auto">⚙ Configurar metas</button>
         </div>
         <div class="kpis" id="desempKpis"></div>
         <div class="tablecard">
@@ -543,6 +574,35 @@ td{padding:13px 18px;vertical-align:middle}
           <div class="empty" id="desempEmpty" style="display:none">
             <div class="big">Nenhum orçamento neste período</div>
             <div>Ajuste os filtros ou cadastre um novo orçamento.</div>
+          </div>
+        </div>
+
+        <div class="metas-overlay" id="metasOverlay">
+          <div class="metas-modal">
+            <h2>Configurar metas</h2>
+            <div class="desc">Defina as metas da equipe e individuais por colaboradora para o mês selecionado. Valores em R$ aceitam formato brasileiro (ex: 12.500,00). Life Essencial/Orto são quantidades.</div>
+            <div class="metas-mes-row">
+              <label for="metasMes">Mês</label>
+              <input type="month" id="metasMes">
+            </div>
+            <div style="overflow-x:auto">
+              <table class="metas-table">
+                <thead><tr>
+                  <th>Quem</th>
+                  <th class="num">Caixa (R$)</th>
+                  <th class="num">Efetivação (R$)</th>
+                  <th class="num">Financiamento (R$)</th>
+                  <th class="num">Life Essencial</th>
+                  <th class="num">Life Orto</th>
+                </tr></thead>
+                <tbody id="metasTbody"></tbody>
+              </table>
+            </div>
+            <div class="metas-actions">
+              <button class="btn" id="btnSalvarMetas">Salvar metas</button>
+              <button class="btn btn-ghost" id="btnFecharMetas">Fechar</button>
+            </div>
+            <div class="metas-msg" id="metasMsg"></div>
           </div>
         </div>
       </section>
@@ -641,7 +701,7 @@ document.querySelectorAll('.nav-item').forEach(function(b){b.onclick=function(){
   var semPeriodo=(v==='import'||v==='novo-orcamento'||v==='desempenho'); document.getElementById('periodBar').style.display=semPeriodo?'none':'flex';
   document.getElementById('side').classList.remove('show');
   window.scrollTo(0,0);
-  if(v==='desempenho'){ carregarOrcamentos().then(desempRender); }
+  if(v==='desempenho'){ Promise.all([carregarOrcamentos(), carregarMetas()]).then(desempRender); }
 };});
 document.getElementById('menuBtn').onclick=function(){document.getElementById('side').classList.toggle('show');};
 
@@ -1465,8 +1525,10 @@ function orcWire(){
 
 /* ============ DESEMPENHO ============ */
 var ORCAMENTOS = [];
+var METAS = {};
 var dFiltro = {ini:'', fim:'', mes:'', colab:'', open:{}};
 var CAIXA_FORMAS = ['Dinheiro','Débito','PIX','Financiamento'];
+var META_ZERO = {caixa:0, efetivacao:0, financiamento:0, life_essencial:0, life_orto:0};
 var MES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 var DESEMP_STATUS_LBL = {pago:'Pago', lancar:'Lançar', link_enviado:'Link Enviado', acompanhar:'Acompanhar'};
 var DESEMP_STATUS_CLS = {pago:'fechou', lancar:'em_aberto', link_enviado:'em_aberto', acompanhar:'sem_orcamento'};
@@ -1479,6 +1541,56 @@ async function carregarOrcamentos(){
   }catch(e){
     console.warn('Falha ao carregar orçamentos:', e);
   }
+}
+async function carregarMetas(){
+  try{
+    var snap = await db.collection('painel_metas').get();
+    METAS = {};
+    snap.forEach(function(doc){ var d=doc.data(); METAS[doc.id] = d; });
+  }catch(e){
+    console.warn('Falha ao carregar metas:', e);
+  }
+}
+function metaAtual(){
+  var hoje = new Date();
+  var mesHoje = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  var mesRef = dFiltro.mes || mesHoje;
+  var doc = METAS[mesRef];
+  if(!doc) return Object.assign({}, META_ZERO);
+  var perfil = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
+  if(perfil === 'colaboradora'){
+    var email = (USUARIO_ATUAL.email||'').toLowerCase();
+    return (doc.individual && doc.individual[email]) || Object.assign({}, META_ZERO);
+  }
+  if(dFiltro.colab){
+    var emailColab = null;
+    Object.keys(USUARIOS).forEach(function(em){
+      if(USUARIOS[em].nome === dFiltro.colab) emailColab = em;
+    });
+    if(emailColab && doc.individual && doc.individual[emailColab]) return doc.individual[emailColab];
+    return Object.assign({}, META_ZERO);
+  }
+  return doc.equipe || Object.assign({}, META_ZERO);
+}
+function pctClass(pct){
+  if(pct>=100) return 'ok';
+  if(pct>=50) return 'warn';
+  return 'bad';
+}
+function cardMeta(cls, lbl, alcancado, meta, isMoney){
+  var alcStr = isMoney ? BRL(alcancado) : alcancado;
+  var metaStr = isMoney ? BRL(meta) : meta;
+  var falta = Math.max(0, meta - alcancado);
+  var faltaStr = isMoney ? BRL(falta) : falta;
+  var pctHtml;
+  if(!meta){
+    pctHtml = '<span class="kpi-pct none">sem meta</span>';
+  } else {
+    var pct = alcancado/meta*100;
+    pctHtml = '<span class="kpi-pct '+pctClass(pct)+'">'+pct.toFixed(0)+'%</span>';
+  }
+  return '<div class="kpi '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+alcStr+'</div>'
+    +'<div class="kpi-meta">Meta: <b>'+metaStr+'</b> · Falta: <b>'+faltaStr+'</b> · '+pctHtml+'</div></div>';
 }
 
 function orcamentosVisiveis(){
@@ -1530,6 +1642,8 @@ function desempRebuildFiltros(){
   var p = USUARIO_ATUAL && USUARIO_ATUAL.perfil;
   if(p==='gestora'||p==='coordenador'){ wrap.style.display='flex'; }
   else { wrap.style.display='none'; dFiltro.colab=''; sc.value=''; }
+  var btnCfg = document.getElementById('btnCfgMetas');
+  if(btnCfg) btnCfg.style.display = (p==='gestora'||p==='coordenador') ? 'inline-block' : 'none';
 }
 
 function desempRenderKPIs(rows){
@@ -1554,19 +1668,20 @@ function desempRenderKPIs(rows){
   var conv = n>0 ? (nPago/n*100) : 0;
   var ticketOrcado = n>0 ? somaTotal/n : 0;
   var ticketEfet = nPago>0 ? pagoTotal/nPago : 0;
-  function card(cls,lbl,val,sub){
+  var meta = metaAtual();
+  function cardSimples(cls,lbl,val,sub){
     return '<div class="kpi '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>';
   }
   document.getElementById('desempKpis').innerHTML =
-    card('k-sky','Qtd de orçamentos',n,'') +
-    card('k-green','Qtd efetivados',nPago,conv.toFixed(1)+'% de conversão') +
-    card('k-green','Efetivação realizado',BRL(pagoTotal),'soma do total dos pagos') +
-    card('k-sky','Caixa realizado',BRL(caixa),'Dinheiro · Débito · PIX · Financ.') +
-    card('k-amber','Financiamento',BRL(financ),'soma das formas Financiamento') +
-    card('k-sky','Ticket médio orçado',BRL(ticketOrcado),'') +
-    card('k-green','Ticket médio efetivado',BRL(ticketEfet),'') +
-    card('k-coral','Life Essencial',lifeEss,'orçamentos com plano') +
-    card('k-coral','Life Orto',lifeOrto,'orçamentos com plano');
+    cardSimples('k-sky','Qtd de orçamentos',n,'') +
+    cardSimples('k-green','Qtd efetivados',nPago,conv.toFixed(1)+'% de conversão') +
+    cardMeta('k-green','Efetivação realizado', pagoTotal, +meta.efetivacao||0, true) +
+    cardMeta('k-sky','Caixa realizado', caixa, +meta.caixa||0, true) +
+    cardMeta('k-amber','Financiamento', financ, +meta.financiamento||0, true) +
+    cardSimples('k-sky','Ticket médio orçado',BRL(ticketOrcado),'') +
+    cardSimples('k-green','Ticket médio efetivado',BRL(ticketEfet),'') +
+    cardMeta('k-coral','Life Essencial', lifeEss, +meta.life_essencial||0, false) +
+    cardMeta('k-coral','Life Orto', lifeOrto, +meta.life_orto||0, false);
 }
 
 function desempRenderLista(rows){
@@ -1645,6 +1760,67 @@ function desempRender(){
   desempRenderLista(rows);
 }
 
+/* ==== MODAL DE METAS ==== */
+function metasInputs(target, vals){
+  var keys = ['caixa','efetivacao','financiamento','life_essencial','life_orto'];
+  return keys.map(function(k){
+    var v = vals && vals[k] != null ? vals[k] : 0;
+    return '<td class="num"><input type="text" inputmode="decimal" data-key="'+k+'" data-target="'+target+'" value="'+v+'"></td>';
+  }).join('');
+}
+function metasModalBuildRows(mes){
+  var doc = METAS[mes] || {equipe:{}, individual:{}};
+  var equipe = doc.equipe || {};
+  var rows = '<tr class="equipe-row" data-target="equipe"><td>Equipe</td>'+metasInputs('equipe', equipe)+'</tr>';
+  Object.keys(USUARIOS).forEach(function(email){
+    var u = USUARIOS[email];
+    if(u.perfil !== 'colaboradora') return;
+    var vals = (doc.individual && doc.individual[email]) || {};
+    rows += '<tr data-target="'+email+'"><td>'+u.nome+'</td>'+metasInputs(email, vals)+'</tr>';
+  });
+  document.getElementById('metasTbody').innerHTML = rows;
+}
+function metasModalOpen(){
+  var hoje = new Date();
+  var mesHoje = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  var mes = dFiltro.mes || mesHoje;
+  document.getElementById('metasMes').value = mes;
+  metasModalBuildRows(mes);
+  document.getElementById('metasMsg').className = 'metas-msg';
+  document.getElementById('metasMsg').textContent = '';
+  document.getElementById('metasOverlay').classList.add('show');
+}
+function metasModalClose(){
+  document.getElementById('metasOverlay').classList.remove('show');
+}
+async function metasModalSave(){
+  var msg = document.getElementById('metasMsg');
+  function show(t,cls){ msg.className='metas-msg show '+cls; msg.textContent=t; }
+  var mes = document.getElementById('metasMes').value;
+  if(!mes){ show('Selecione um mês.','err'); return; }
+  var equipe = {}, individual = {};
+  document.querySelectorAll('#metasTbody input').forEach(function(inp){
+    var target = inp.dataset.target;
+    var key = inp.dataset.key;
+    var val = brToNum(inp.value);
+    if(target === 'equipe'){ equipe[key] = val; }
+    else { if(!individual[target]) individual[target] = {}; individual[target][key] = val; }
+  });
+  var doc = {mes:mes, equipe:equipe, individual:individual};
+  var btn = document.getElementById('btnSalvarMetas'); btn.disabled = true;
+  try{
+    await db.collection('painel_metas').doc(mes).set(doc);
+    METAS[mes] = doc;
+    show('Metas salvas com sucesso!','ok');
+    setTimeout(function(){ metasModalClose(); desempRender(); }, 600);
+  }catch(e){
+    console.warn('Falha ao salvar metas:', e);
+    show('Erro ao salvar ('+(e.message||e)+'). Tente novamente.','err');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
 var desempWired=false;
 function desempWire(){
   if(desempWired) return; desempWired=true;
@@ -1660,6 +1836,13 @@ function desempWire(){
     document.getElementById('dColab').value='';
     desempRender();
   });
+  document.getElementById('btnCfgMetas').addEventListener('click', metasModalOpen);
+  document.getElementById('btnFecharMetas').addEventListener('click', metasModalClose);
+  document.getElementById('btnSalvarMetas').addEventListener('click', metasModalSave);
+  document.getElementById('metasMes').addEventListener('change', function(e){ metasModalBuildRows(e.target.value); });
+  document.getElementById('metasOverlay').addEventListener('click', function(e){
+    if(e.target === e.currentTarget) metasModalClose();
+  });
 }
 
 var booted=false;
@@ -1670,7 +1853,7 @@ async function boot(){
   rebuildFilters(); renderHist(); renderAll();
   orcWire();
   desempWire();
-  await carregarOrcamentos();
+  await Promise.all([carregarOrcamentos(), carregarMetas()]);
   desempRender();
 }
 
